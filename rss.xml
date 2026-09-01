@@ -1,6 +1,25 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0"><channel>
-<title>TrendRader</title><link>https://trendrader.space/</link>
-<description>Breaking news, politics, technology, business, entertainment and trending stories from Nigeria and around the world.</description>
-<language>en-ng</language><ttl>60</ttl>
-</channel></rss>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/" xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:media="http://search.yahoo.com/mrss/">
+<channel>
+    <title>TrendRader</title>
+    <link>https://trendrader.space/articles/</link>
+    <description>Technology news, analysis and intelligence from TrendRader.</description>
+    <language>en</language>
+    <lastBuildDate>Tue, 01 Sep 2026 01:02:29 GMT</lastBuildDate>
+    <generator>TrendRader Editorial Publisher</generator>
+    <atom:link href="https://trendrader.space/rss.xml" rel="self" type="application/rss+xml" />
+
+    <item>
+        <title>TrendRader Launches New Digital News Platform for Nigeria and the World</title>
+        <link>https://trendrader.space/articles/trendrader-launches-new-digital-news-platform-for-nigeria-and-the-world.html</link>
+        <guid isPermaLink="true">https://trendrader.space/articles/trendrader-launches-new-digital-news-platform-for-nigeria-and-the-world.html</guid>
+        <description>TrendRader Launches New Digital News Platform for Nigeria and the World: TrendRader Launches as a New Digital News Platform TrendRader has officially launche...</description>
+        <pubDate>Tue, 01 Sep 2026 01:02:26 GMT</pubDate>
+        <dc:creator>TrendRader Editorial</dc:creator>
+        <category>Technology</category>
+        <media:content url="https://res.cloudinary.com/dxdbn6xwy/image/upload/v1788224388/trendrader/trendrader-launches-new-digital-news-platform-for-nigeria-and-the-world-featured.jpg" medium="image" />
+        <media:thumbnail url="https://res.cloudinary.com/dxdbn6xwy/image/upload/v1788224388/trendrader/trendrader-launches-new-digital-news-platform-for-nigeria-and-the-world-featured.jpg" />
+        <content:encoded><![CDATA[<p>TrendRader Launches New Digital News Platform for Nigeria and the World: TrendRader Launches as a New Digital News Platform TrendRader has officially launche...</p>]]></content:encoded>
+    </item>
+</channel>
+</rss>
