@@ -1,839 +1,216 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-NG">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-  <meta name="description" content="TrendRader — independent digital news covering Nigeria, world affairs, politics, technology, business, entertainment and the stories shaping what happens next.">
-  <meta name="theme-color" content="#f4f2ed">
-
-  <meta property="og:type" content="website">
-  <meta property="og:title" content="TrendRader — Nigeria, World News, Politics, Tech & Business">
-  <meta property="og:description" content="Independent reporting, breaking news and sharp context across Nigeria, Africa and the world — politics, technology, business, entertainment and trending stories.">
-
-  <title>TrendRader — Nigeria, World News, Politics, Tech & Business</title>
-
-  <link rel="canonical" href="https://trendrader.space/">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="description" content="TrendRader delivers breaking news, politics, technology, business, entertainment, sports and trending stories from Nigeria and around the world.">
+  <meta name="theme-color" content="#f5f3ee">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="TrendRader Editorial">
-  <meta name="keywords" content="Nigeria news, breaking news Nigeria, politics Nigeria, technology, business, entertainment, trending news, world news, Africa news">
-  <meta property="og:url" content="https://trendrader.space/">
+  <meta property="og:type" content="website">
   <meta property="og:site_name" content="TrendRader">
+  <meta property="og:title" content="TrendRader — Nigeria & World News">
+  <meta property="og:description" content="Breaking news, politics, technology, business, entertainment, sports and trending stories from Nigeria and around the world.">
+  <meta property="og:url" content="https://trendrader.space/">
   <meta property="og:locale" content="en_NG">
   <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:site" content="@TrendRader">
-  <meta name="twitter:title" content="TrendRader — Nigeria, World News, Politics, Tech & Business">
-  <meta name="twitter:description" content="Breaking news, politics, technology, business, entertainment and trending stories from Nigeria and around the world.">
-  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <meta name="twitter:title" content="TrendRader — Nigeria & World News">
+  <meta name="twitter:description" content="Breaking news, politics, technology, business, entertainment, sports and trending stories from Nigeria and around the world.">
+  <link rel="canonical" href="https://trendrader.space/">
   <link rel="alternate" type="application/rss+xml" title="TrendRader RSS" href="./rss.xml">
+  <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
     "@graph":[
-      {"@type":"Organization","@id":"https://trendrader.space/#organization","name":"TrendRader","url":"https://trendrader.space/","logo":{"@type":"ImageObject","url":"https://trendrader.space/assets/logo.svg"}},
-      {"@type":"WebSite","@id":"https://trendrader.space/#website","url":"https://trendrader.space/","name":"TrendRader","publisher":{"@id":"https://trendrader.space/#organization"},"inLanguage":"en-NG"},
-      {"@type":"CollectionPage","@id":"https://trendrader.space/#webpage","url":"https://trendrader.space/","name":"TrendRader — Nigeria, World News, Politics, Tech & Business","isPartOf":{"@id":"https://trendrader.space/#website"},"about":{"@id":"https://trendrader.space/#organization"}}
+      {
+        "@type":"Organization",
+        "@id":"https://trendrader.space/#organization",
+        "name":"TrendRader",
+        "url":"https://trendrader.space/",
+        "logo":{
+          "@type":"ImageObject",
+          "url":"https://trendrader.space/assets/logo.svg"
+        }
+      },
+      {
+        "@type":"WebSite",
+        "@id":"https://trendrader.space/#website",
+        "url":"https://trendrader.space/",
+        "name":"TrendRader",
+        "publisher":{"@id":"https://trendrader.space/#organization"},
+        "inLanguage":"en-NG"
+      },
+      {
+        "@type":"CollectionPage",
+        "@id":"https://trendrader.space/#webpage",
+        "url":"https://trendrader.space/",
+        "name":"TrendRader — Nigeria & World News",
+        "isPartOf":{"@id":"https://trendrader.space/#website"}
+      }
     ]
   }
   </script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="./style.css">
 </head>
-
 <body>
-
   <div class="cursor-glow" aria-hidden="true"></div>
 
-  <!-- HEADER -->
   <header class="site-header" id="siteHeader">
-
     <div class="header-inner">
-
-      <a class="brand" href="#" aria-label="TrendRader home">
+      <a class="brand" href="./index.html" aria-label="TrendRader home">
         <span class="brand-mark">T</span>
         <span class="brand-name">TRENDRADER</span>
       </a>
 
       <nav class="desktop-nav" aria-label="Primary navigation">
-        <a class="active" href="#">Home</a>
+        <a class="active" href="./index.html">Home</a>
         <a href="#latest">Latest</a>
         <a href="#politics">Politics</a>
         <a href="#technology">Technology</a>
         <a href="#business">Business</a>
         <a href="#entertainment">Entertainment</a>
+        <a href="#sports">Sports</a>
         <a href="#trending">Trending</a>
       </nav>
 
       <div class="header-actions">
-
-        <button
-          class="icon-button"
-          id="searchToggle"
-          type="button"
-          aria-label="Open search"
-          aria-expanded="false"
-          aria-controls="searchPanel"
-        >
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <circle cx="11" cy="11" r="7"></circle>
-            <path d="m20 20-4-4"></path>
-          </svg>
+        <button class="icon-button" id="searchToggle" type="button" aria-label="Open search" aria-expanded="false" aria-controls="searchPanel">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
         </button>
-
-        <button
-          class="menu-button"
-          id="menuToggle"
-          type="button"
-          aria-label="Open menu"
-          aria-expanded="false"
-          aria-controls="mobileNav"
-        >
-          <span></span>
-          <span></span>
+        <button class="menu-button" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
+          <span></span><span></span>
         </button>
-
       </div>
-
     </div>
 
-    <!-- SEARCH -->
-    <div class="search-panel" id="searchPanel">
-
+    <div class="search-panel" id="searchPanel" aria-hidden="true">
       <form id="searchForm">
-
-        <div class="search-input-wrap">
-
+        <label class="search-input-wrap" for="searchInput">
           <span class="search-index">SEARCH</span>
-
-          <input
-            id="searchInput"
-            type="search"
-            placeholder="Search stories..."
-            autocomplete="off"
-          >
-
-        </div>
-
-        <button type="submit">
-          Search
-          <span>↗</span>
-        </button>
-
+          <input id="searchInput" type="search" placeholder="Search published stories..." autocomplete="off">
+        </label>
+        <button type="submit">Search <span>↗</span></button>
       </form>
-
     </div>
 
-    <!-- MOBILE NAV -->
     <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
-
-      <a href="#">
-        <span>01</span>
-        Home
-      </a>
-
-      <a href="#latest">
-        <span>02</span>
-        Latest
-      </a>
-
+      <a href="./index.html"><span>01</span>Home</a>
+      <a href="#latest"><span>02</span>Latest</a>
       <a href="#politics"><span>03</span>Politics</a>
       <a href="#technology"><span>04</span>Technology</a>
       <a href="#business"><span>05</span>Business</a>
       <a href="#entertainment"><span>06</span>Entertainment</a>
-      <a href="#trending"><span>07</span>Trending</a>
-
-      <a href="#newsletter">
-        <span>06</span>
-        Newsletter
-      </a>
-
+      <a href="#sports"><span>07</span>Sports</a>
+      <a href="#trending"><span>08</span>Trending</a>
     </nav>
-
   </header>
 
-  <!-- LIVE TICKER -->
-  <div class="ticker">
-
-    <div class="ticker-label">
-      <span></span>
-      LIVE
-    </div>
-
-    <div class="ticker-track">
-
-      <div class="ticker-content">
-
-        <a href="#">Markets open higher as technology stocks rally</a>
-        <i>•</i>
-
-        <a href="#">New generation of AI tools reshapes creative work</a>
-        <i>•</i>
-
-        <a href="#">The cities building the next decade of infrastructure</a>
-        <i>•</i>
-
-        <a href="#">Inside the changing economics of digital media</a>
-        <i>•</i>
-
-      </div>
-
-      <div class="ticker-content" aria-hidden="true">
-
-        <a href="#">Markets open higher as technology stocks rally</a>
-        <i>•</i>
-
-        <a href="#">New generation of AI tools reshapes creative work</a>
-        <i>•</i>
-
-        <a href="#">The cities building the next decade of infrastructure</a>
-        <i>•</i>
-
-        <a href="#">Inside the changing economics of digital media</a>
-        <i>•</i>
-
-      </div>
-
-    </div>
-
+  <div class="ticker" id="liveTicker" hidden>
+    <div class="ticker-label"><span></span>LIVE</div>
+    <div class="ticker-track" id="tickerTrack"></div>
   </div>
 
   <main>
-
-    <!-- HERO -->
     <section class="hero section-wrap">
-
       <div class="hero-copy reveal">
-
-        <div class="hero-kicker">
-          <span>THE TRENDRADER DAILY</span>
-          <i></i>
-          <span>EST. 2026</span>
-        </div>
-
-        <h1>
-          News for people who
-          <em>think ahead.</em>
-        </h1>
-
-        <p class="hero-intro">
-          Sharp reporting, original ideas and the stories shaping technology,
-          business, culture and the world around us.
-        </p>
-
-        <div class="hero-meta">
-
-          <span>Friday, August 28, 2026</span>
-
-          <span class="meta-dot"></span>
-
-          <span>Independent journalism</span>
-
-        </div>
-
+        <div class="hero-kicker"><span>THE TRENDRADER DAILY</span><i></i><span id="todayLabel">NEWS DESK</span></div>
+        <h1>News that helps you <em>see what matters.</em></h1>
+        <p class="hero-intro">Independent digital journalism covering Nigeria, Africa and the world — with speed, clarity and context.</p>
+        <div class="hero-meta"><span id="heroDate">Latest published stories</span><span class="meta-dot"></span><span>Independent journalism</span></div>
       </div>
 
-      <a
-        class="lead-story reveal tilt-card"
-        href="#latest"
-        aria-label="Explore the latest TrendRader stories"
-      >
-
-        <div class="lead-image">
-
-          <img
-            src="https://images.unsplash.com/photo-1495020689067-958852a7765e?auto=format&fit=crop&w=1800&q=88"
-            alt="Newspapers and journalism"
-            fetchpriority="high"
-          >
-
-          <div class="image-shade"></div>
-
-          <div class="lead-index">
-            <span>01</span>
-            <i></i>
-            <span>FEATURE</span>
-          </div>
-
-          <div class="lead-arrow">↗</div>
-
-        </div>
-
-        <div class="lead-content">
-
-          <div class="story-category">
-            FEATURE
-            <span></span>
-            TECHNOLOGY & MEDIA
-          </div>
-
-          <h2>
-            The new information economy is being built in
-            <em>public.</em>
-          </h2>
-
-          <p>
-            Why the next generation of digital media will be defined by
-            trust, speed and radically better experiences.
-          </p>
-
-          <div class="story-byline">
-
-            <span>By Maya Cole</span>
-
-            <span class="byline-line"></span>
-
-            <span>8 min read</span>
-
-          </div>
-
-        </div>
-
-      </a>
-
+      <div id="leadStoryMount" class="lead-story-mount"></div>
     </section>
 
-    <!-- LATEST -->
-    <section class="section-wrap section-block" id="latest"><span id="politics" class="section-anchor" aria-hidden="true"></span>
-
+    <section class="section-wrap section-block" id="latest">
       <div class="section-heading reveal">
-
         <div>
-
-          <div class="section-eyebrow">
-            <span>01</span>
-            NOW
-          </div>
-
+          <div class="section-eyebrow"><span>01</span>NOW</div>
           <h2>Latest stories</h2>
-
         </div>
-
-        <a class="view-all" href="#latest">
-          View all
-          <span>↗</span>
-        </a>
-
+        <span class="feed-status" id="feedStatus">Loading published stories...</span>
       </div>
-
-      <div class="story-grid">
-
-        <article class="story-card reveal tilt-card">
-
-          <a href="#technology">
-
-            <div class="story-image">
-
-              <img
-                src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=85"
-                alt="Computer circuitry"
-                loading="lazy"
-              >
-
-              <span class="image-number">01</span>
-
-              <span class="story-arrow">↗</span>
-
-            </div>
-
-            <div class="story-info">
-
-              <span>Technology</span>
-
-              <i></i>
-
-              <time>42 min ago</time>
-
-            </div>
-
-            <h3>
-              AI is moving from feature to infrastructure.
-            </h3>
-
-            <p>
-              The invisible systems changing how modern products are built.
-            </p>
-
-          </a>
-
-        </article>
-
-        <article class="story-card reveal tilt-card">
-
-          <a href="#business">
-
-            <div class="story-image">
-
-              <img
-                src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1000&q=85"
-                alt="Financial market chart"
-                loading="lazy"
-              >
-
-              <span class="image-number">02</span>
-
-              <span class="story-arrow">↗</span>
-
-            </div>
-
-            <div class="story-info">
-
-              <span>Business</span>
-
-              <i></i>
-
-              <time>1 hr ago</time>
-
-            </div>
-
-            <h3>
-              The companies quietly winning the efficiency race.
-            </h3>
-
-            <p>
-              Inside a new operating model built around fewer layers and
-              faster decisions.
-            </p>
-
-          </a>
-
-        </article>
-
-        <article class="story-card reveal tilt-card">
-
-          <a href="#culture">
-
-            <div class="story-image">
-
-              <img
-                src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1000&q=85"
-                alt="Mountain landscape"
-                loading="lazy"
-              >
-
-              <span class="image-number">03</span>
-
-              <span class="story-arrow">↗</span>
-
-            </div>
-
-            <div class="story-info">
-
-              <span>World</span>
-
-              <i></i>
-
-              <time>2 hrs ago</time>
-
-            </div>
-
-            <h3>
-              What resilient cities are getting right.
-            </h3>
-
-            <p>
-              Infrastructure is becoming a competitive advantage for the
-              places that adapt fastest.
-            </p>
-
-          </a>
-
-        </article>
-
-      </div>
-
+      <div class="story-grid" id="latestGrid" aria-live="polite"></div>
     </section>
 
-    <!-- TECHNOLOGY DEEP DIVE -->
-    <section class="dark-feature" id="technology">
+    <section class="category-section section-wrap" id="politics" data-category="politics">
+      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>02</span>NIGERIA</div><h2>Politics</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+      <div class="category-grid" id="politicsGrid"></div>
+    </section>
 
+    <section class="dark-feature" id="technology" data-category="technology">
       <div class="section-wrap dark-inner">
-
         <div class="dark-copy reveal">
-
-          <div class="dark-kicker">
-            <span>02</span>
-            DEEP DIVE / TECHNOLOGY
-          </div>
-
-          <h2>
-            Technology is not the story.
-            <em>Change is.</em>
-          </h2>
-
-          <p>
-            Long-form reporting on the systems, people and decisions
-            transforming the way we work and live.
-          </p>
-
-          <a class="circle-link" href="#latest">
-            <span>Explore technology</span>
-            <b>↗</b>
-          </a>
-
+          <div class="dark-kicker"><span>03</span>TECHNOLOGY</div>
+          <h2>Technology, AI and the systems changing <em>what comes next.</em></h2>
+          <p>Follow the people, products and decisions shaping the digital economy.</p>
         </div>
-
-        <div class="signal-visual reveal" aria-hidden="true">
-
-          <div class="visual-topline">
-            <span>TRENDRADER / SYSTEM 01</span>
-            <span>LIVE</span>
-          </div>
-
-          <div class="orbit orbit-a"></div>
-          <div class="orbit orbit-b"></div>
-          <div class="orbit orbit-c"></div>
-
-          <div class="signal-core">
-            <span>01</span>
-            <small>TRENDRADER</small>
-          </div>
-
-          <span class="data-label d1">AI / 86%</span>
-          <span class="data-label d2">WEB / 72%</span>
-          <span class="data-label d3">DATA / 94%</span>
-
-          <span class="visual-line line-a"></span>
-          <span class="visual-line line-b"></span>
-          <span class="visual-line line-c"></span>
-
-        </div>
-
+        <div class="dark-stories" id="technologyGrid"></div>
       </div>
-
     </section>
 
-    <!-- EDITOR'S PICK -->
-    <section class="section-wrap section-block" id="business">
-
-      <div class="section-heading reveal">
-
-        <div>
-
-          <div class="section-eyebrow">
-            <span>03</span>
-            EDITOR'S PICK
-          </div>
-
-          <h2>Worth your attention</h2>
-
-        </div>
-
-      </div>
-
-      <div class="editor-grid">
-
-        <a
-          class="editor-main reveal tilt-card"
-          href="#latest"
-        >
-
-          <div class="editor-image">
-
-            <img
-              src="https://images.unsplash.com/photo-1556761175-b413da4baf72?auto=format&fit=crop&w=1400&q=88"
-              alt="People working around a table"
-              loading="lazy"
-            >
-
-            <div class="editor-overlay"></div>
-
-            <div class="editor-number">04</div>
-
-            <div class="editor-content">
-
-              <div class="editor-category">
-                BUSINESS
-                <span></span>
-                8 MIN READ
-              </div>
-
-              <h3>
-                Small teams are becoming serious competitive weapons.
-              </h3>
-
-              <div class="editor-link">
-                Read story
-                <span>↗</span>
-              </div>
-
-            </div>
-
-          </div>
-
-        </a>
-
-        <div class="side-stories">
-
-          <article class="side-story reveal">
-
-            <div class="side-story-number">01</div>
-
-            <div>
-
-              <div class="side-story-category">
-                CULTURE
-              </div>
-
-              <h3>
-                Why good design is becoming a strategic discipline.
-              </h3>
-
-              <p>6 min read</p>
-
-            </div>
-
-            <span class="side-story-arrow">↗</span>
-
-          </article>
-
-          <article class="side-story reveal">
-
-            <div class="side-story-number">02</div>
-
-            <div>
-
-              <div class="side-story-category">
-                WORLD
-              </div>
-
-              <h3>
-                The next decade will belong to adaptive infrastructure.
-              </h3>
-
-              <p>9 min read</p>
-
-            </div>
-
-            <span class="side-story-arrow">↗</span>
-
-          </article>
-
-          <article class="side-story reveal">
-
-            <div class="side-story-number">03</div>
-
-            <div>
-
-              <div class="side-story-category">
-                IDEAS
-              </div>
-
-              <h3>
-                Attention is scarce. Interfaces should respect it.
-              </h3>
-
-              <p>5 min read</p>
-
-            </div>
-
-            <span class="side-story-arrow">↗</span>
-
-          </article>
-
-        </div>
-
-      </div>
-
+    <section class="category-section section-wrap" id="business" data-category="business">
+      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>04</span>ECONOMY</div><h2>Business</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+      <div class="category-grid" id="businessGrid"></div>
     </section>
 
-    <!-- CULTURE -->
-    <section class="culture-strip" id="entertainment">
-
-      <div class="section-wrap culture-inner">
-
-        <div class="culture-title reveal">
-
-          <div class="section-eyebrow">
-            <span>04</span>
-            CULTURE
-          </div>
-
-          <h2>
-            Beyond the
-            <em>headline.</em>
-          </h2>
-
-          <p>
-            Ideas, people and the cultural shifts worth understanding.
-          </p>
-
-        </div>
-
-        <div class="culture-items">
-
-          <article class="culture-item reveal">
-
-            <div class="culture-item-top">
-
-              <strong>01</strong>
-
-              <span>DESIGN</span>
-
-            </div>
-
-            <h3>
-              The return of intentional interfaces.
-            </h3>
-
-            <a href="#latest">
-              Explore
-              <span>↗</span>
-            </a>
-
-          </article>
-
-          <article class="culture-item reveal">
-
-            <div class="culture-item-top">
-
-              <strong>02</strong>
-
-              <span>IDEAS</span>
-
-            </div>
-
-            <h3>
-              What happens when everything becomes searchable?
-            </h3>
-
-            <a href="#latest">
-              Explore
-              <span>↗</span>
-            </a>
-
-          </article>
-
-          <article class="culture-item reveal">
-
-            <div class="culture-item-top">
-
-              <strong>03</strong>
-
-              <span>PEOPLE</span>
-
-            </div>
-
-            <h3>
-              The builders behind the new internet.
-            </h3>
-
-            <a href="#latest">
-              Explore
-              <span>↗</span>
-            </a>
-
-          </article>
-
-        </div>
-
-      </div>
-
+    <section class="category-section section-wrap" id="entertainment" data-category="entertainment">
+      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>05</span>CULTURE</div><h2>Entertainment</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+      <div class="category-grid" id="entertainmentGrid"></div>
     </section>
 
-    <!-- NEWSLETTER -->
-    <span id="trending" class="section-anchor" aria-hidden="true"></span><section class="newsletter section-wrap reveal" id="newsletter">
+    <section class="category-section section-wrap" id="sports" data-category="sports">
+      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>06</span>SPORT</div><h2>Sports</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+      <div class="category-grid" id="sportsGrid"></div>
+    </section>
 
+    <section class="category-section section-wrap" id="trending" data-category="trending">
+      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>07</span>NOW MOVING</div><h2>Trending</h2></div><a class="view-all" href="#latest">All stories <span>↗</span></a></div>
+      <div class="category-grid" id="trendingGrid"></div>
+    </section>
+
+    <section class="empty-state section-wrap" id="emptyState" hidden>
+      <div class="empty-index">TRENDRADER / NEWS DESK</div>
+      <h2>No published stories yet.</h2>
+      <p>Published stories from the TrendRader editorial system will appear here automatically. Drafts and unpublished records are never shown on the public feed.</p>
+      <a href="./admin/index.html">Open Editorial Desk <span>↗</span></a>
+    </section>
+
+    <section class="newsletter section-wrap reveal" id="newsletter">
       <div class="newsletter-copy">
-
-        <div class="newsletter-eyebrow">
-          <span></span>
-          THE TRENDRADER BRIEF
-        </div>
-
-        <h2>
-          Know what matters.
-          <em>Before it matters.</em>
-        </h2>
-
-        <p>
-          One concise briefing covering the ideas, technologies and stories
-          shaping the world ahead.
-        </p>
-
+        <div class="newsletter-eyebrow"><span></span>THE TRENDRADER BRIEF</div>
+        <h2>Know what matters. <em>Stay ahead.</em></h2>
+        <p>A concise briefing of the stories, ideas and developments worth your attention.</p>
       </div>
-
       <form id="newsletterForm">
-
         <div class="newsletter-field">
-
-          <label for="newsletterEmail">
-            Email address
-          </label>
-
-          <input
-            id="newsletterEmail"
-            type="email"
-            placeholder="you@example.com"
-            autocomplete="email"
-            required
-          >
-
+          <label for="newsletterEmail">Email address</label>
+          <input id="newsletterEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
         </div>
-
-        <button type="submit">
-          Subscribe
-          <span>↗</span>
-        </button>
-
-        <small id="newsletterMessage">
-          No noise. Unsubscribe anytime.
-        </small>
-
+        <button type="submit">Subscribe <span>↗</span></button>
+        <small id="newsletterMessage">No noise. Unsubscribe anytime.</small>
       </form>
-
     </section>
-
   </main>
 
-  <!-- FOOTER -->
   <footer class="site-footer">
-
     <div class="section-wrap footer-top">
-
       <div class="footer-brand">
-
-        <a class="brand" href="#">
-
-          <span class="brand-mark">T</span>
-          <span class="brand-name">TRENDRADER</span>
-
-        </a>
-
-        <p>
-          Independent digital news for Nigeria and the world.
-        </p>
-
+        <a class="brand" href="./index.html"><span class="brand-mark">T</span><span class="brand-name">TRENDRADER</span></a>
+        <p>Independent digital news for Nigeria and the world.</p>
       </div>
-
-      <div class="footer-index">
-
-        <span>EST. 2026</span>
-        <span>INDEPENDENT / DIGITAL</span>
-
-      </div>
-
+      <div class="footer-index"><span>EST. 2026</span><span>INDEPENDENT / DIGITAL</span></div>
     </div>
-
     <div class="section-wrap footer-bottom">
-
-      <span>
-        © 2026 TrendRader Media
-      </span>
-
-      <div>
-        <a href="#">Privacy</a>
-        <a href="#">Terms</a>
-        <a href="#">Contact</a>
-      </div>
-
+      <span>© <span id="footerYear">2026</span> TrendRader Media</span>
+      <div><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
     </div>
-
   </footer>
 
   <script src="./script.js"></script>
-
 </body>
 </html>

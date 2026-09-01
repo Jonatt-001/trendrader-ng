@@ -1,138 +1,451 @@
-const reducedMotion=window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const progressBar=document.getElementById("progressBar");
-const header=document.getElementById("siteHeader");
+const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const ARTICLE_DB = "./assets/articles.json";
+const BASE_SITE = "https://trendrader.space";
 
-function updateScroll(){
-  const scrollTop=window.scrollY;
-  const doc=document.documentElement;
-  const max=doc.scrollHeight-window.innerHeight;
-  progressBar.style.width=`${max>0?(scrollTop/max)*100:0}%`;
-  header.classList.toggle("scrolled",scrollTop>20);
+const $ = (selector, root = document) => root.querySelector(selector);
+const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+
+function escapeHtml(value) {
+  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
+    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
+  }[char]));
 }
-window.addEventListener("scroll",updateScroll,{passive:true});updateScroll();
 
-const menuToggle=document.getElementById("menuToggle");
-const mobileNav=document.getElementById("mobileNav");
-menuToggle.addEventListener("click",()=>{
-  const open=mobileNav.classList.toggle("open");
-  menuToggle.setAttribute("aria-expanded",String(open));
-});
-document.querySelectorAll(".mobile-nav a").forEach(a=>a.addEventListener("click",()=>{
-  mobileNav.classList.remove("open");menuToggle.setAttribute("aria-expanded","false");
-}));
+function normalizeArticle(article) {
+  return {
+    ...article,
+    title: String(article.title || article.headline || "").trim(),
+    desc: String(article.desc || article.description || article.excerpt || article.dek || "").trim(),
+    image: String(article.image || article.imageUrl || article.featuredImage || "").trim(),
+    category: String(article.category || article.meta || "News").trim(),
+    tag: String(article.tag || article.contentType || "News").trim(),
+    author: String(article.author || "TrendRader Editorial").trim(),
+    date: article.date || article.publishedAt || article.datePublished || article.createdAt || "",
+    slug: String(article.slug || "").trim(),
+    url: String(article.url || article.page || "").trim(),
+    delta: String(article.delta || "").trim(),
+    modified: article.modified || article.dateModified || article.date || ""
+  };
+}
 
-const observer=new IntersectionObserver(entries=>{
-  entries.forEach(entry=>{
-    if(entry.isIntersecting){
-      entry.target.classList.add("visible");
-      observer.unobserve(entry.target);
-    }
-  });
-},{threshold:.1,rootMargin:"0px 0px -40px"});
-document.querySelectorAll(".reveal").forEach((el,i)=>{
-  if(!reducedMotion)el.style.transitionDelay=`${Math.min(i*45,240)}ms`;
-  observer.observe(el);
-});
+function isPublished(article) {
+  const status = String(article.status || article.state || "").toLowerCase();
+  const page = String(article.page || "").toLowerCase();
+  if (["draft","unpublished","archived","deleted"].includes(status)) return false;
+  if (page && page !== "news") return false;
+  return Boolean(article.title && (article.slug || article.url));
+}
 
-const glow=document.querySelector(".cursor-glow");
-if(!reducedMotion&&window.matchMedia("(hover:hover)").matches){
-  window.addEventListener("pointermove",e=>{
-    glow.style.left=`${e.clientX}px`;glow.style.top=`${e.clientY}px`;
-  },{passive:true});
-  document.querySelectorAll(".tilt-card").forEach(card=>{
-    card.addEventListener("pointermove",e=>{
-      const r=card.getBoundingClientRect(),x=(e.clientX-r.left)/r.width-.5,y=(e.clientY-r.top)/r.height-.5;
-      card.style.transform=`perspective(1000px) rotateX(${-y*2}deg) rotateY(${x*2}deg) translateY(-3px)`;
+function sortArticles(items) {
+  return [...items].sort((a,b) => new Date(b.date || 0) - new Date(a.date || 0));
+}
+
+function articleUrl(article) {
+  if (article.url && article.url !== "#") {
+    return article.url.startsWith("http") || article.url.startsWith("/") ? article.url : `../${article.url.replace(/^\.\//, "")}`;
+  }
+  return `../articles/${encodeURIComponent(article.slug)}.html`;
+}
+
+function formatDate(value) {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "Recently published";
+  return new Intl.DateTimeFormat("en-NG", { day:"numeric", month:"long", year:"numeric" }).format(date);
+}
+
+function readTime(article, bodyText = "") {
+  const supplied = Number(article.readTime);
+  if (Number.isFinite(supplied) && supplied > 0) return Math.round(supplied);
+  const words = bodyText.trim().split(/\s+/).filter(Boolean).length;
+  return Math.max(1, Math.round(words / 200) || 1);
+}
+
+function setMeta(selector, content) {
+  const el = $(selector);
+  if (el && content) el.setAttribute("content", content);
+}
+
+function setCanonical(url) {
+  const canonical = $('link[rel="canonical"]');
+  if (canonical) canonical.setAttribute("href", url);
+}
+
+function getSlugFromLocation() {
+  const query = new URLSearchParams(location.search).get("slug");
+  if (query) return decodeURIComponent(query);
+  const path = location.pathname.split("/").filter(Boolean);
+  const file = path[path.length - 1] || "";
+  if (file.endsWith(".html") && file !== "article.html") return file.replace(/\.html$/i, "");
+  return "";
+}
+
+function safeBodyHtml(html) {
+  const template = document.createElement("template");
+  template.innerHTML = String(html || "");
+  template.content.querySelectorAll("script,style,object,embed,form").forEach((node) => node.remove());
+  template.content.querySelectorAll("[onload],[onclick],[onerror],[onmouseover]").forEach((node) => {
+    [...node.attributes].forEach((attr) => {
+      if (/^on/i.test(attr.name)) node.removeAttribute(attr.name);
     });
-    card.addEventListener("pointerleave",()=>card.style.transform="");
   });
+  return template.innerHTML;
 }
 
-const shareModal=document.getElementById("shareModal");
-const openShare=()=>{shareModal.classList.add("open");shareModal.setAttribute("aria-hidden","false")};
-const closeShare=()=>{shareModal.classList.remove("open");shareModal.setAttribute("aria-hidden","true")};
-document.getElementById("shareTop").addEventListener("click",openShare);
-document.getElementById("shareRail").addEventListener("click",openShare);
-document.getElementById("closeShare").addEventListener("click",closeShare);
-document.getElementById("shareBackdrop").addEventListener("click",closeShare);
+function inlineFormat(value, attributes = {}) {
+  let text = escapeHtml(value);
+  if (attributes.bold) text = `<strong>${text}</strong>`;
+  if (attributes.italic) text = `<em>${text}</em>`;
+  if (attributes.underline) text = `<u>${text}</u>`;
+  if (attributes.strike) text = `<s>${text}</s>`;
+  if (attributes.link) text = `<a href="${escapeHtml(attributes.link)}" rel="noopener noreferrer">${text}</a>`;
+  return text;
+}
 
-document.querySelectorAll("[data-share]").forEach(btn=>{
-  btn.addEventListener("click",async()=>{
-    const type=btn.dataset.share,url=location.href,title=document.title;
-    if(type==="copy"){
-      try{await navigator.clipboard.writeText(url);document.getElementById("shareMessage").textContent="Link copied to clipboard."}
-      catch{document.getElementById("shareMessage").textContent=url}
+function quillDeltaToHtml(delta) {
+  if (!delta || !Array.isArray(delta.ops)) return "";
+  let html = "";
+  let line = "";
+  let listType = null;
+  const closeList = () => {
+    if (listType) { html += `</${listType}>`; listType = null; }
+  };
+  delta.ops.forEach((op) => {
+    const insert = op.insert;
+    if (typeof insert === "object" && insert.image) {
+      line += `<img src="${escapeHtml(insert.image)}" alt="TrendRader article image" loading="lazy">`;
       return;
     }
-    const target=type==="x"
-      ?`https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`
-      :`https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-    window.open(target,"share","width=700,height=600,noopener,noreferrer");
+    if (typeof insert !== "string") return;
+    const lines = insert.split("\n");
+    lines.forEach((part, index) => {
+      if (part) line += inlineFormat(part, op.attributes || {});
+      if (index === lines.length - 1) return;
+      const attrs = op.attributes || {};
+      const block = attrs.header ? `h${Math.min(3, Math.max(2, Number(attrs.header)))}`
+        : attrs.blockquote ? "blockquote"
+        : attrs.list === "ordered" ? "ol"
+        : attrs.list === "bullet" ? "ul"
+        : null;
+      if (block === "ol" || block === "ul") {
+        if (listType !== block) { closeList(); listType = block; html += `<${block}>`; }
+        html += `<li>${line}</li>`;
+      } else {
+        closeList();
+        if (block === "blockquote") html += `<blockquote><p>${line}</p></blockquote>`;
+        else if (block) html += `<${block}>${line}</${block}>`;
+        else if (line.trim()) html += `<p>${line}</p>`;
+      }
+      line = "";
+    });
   });
-});
-
-const lightbox=document.getElementById("lightbox");
-const lightboxImage=document.getElementById("lightboxImage");
-document.getElementById("expandImage").addEventListener("click",()=>{
-  lightboxImage.src=document.getElementById("heroImage").src;
-  lightboxImage.alt=document.getElementById("heroImage").alt;
-  lightbox.classList.add("open");lightbox.setAttribute("aria-hidden","false");
-});
-const closeLightbox=()=>{lightbox.classList.remove("open");lightbox.setAttribute("aria-hidden","true")};
-document.getElementById("closeLightbox").addEventListener("click",closeLightbox);
-lightbox.addEventListener("click",e=>{if(e.target===lightbox)closeLightbox()});
-
-document.addEventListener("keydown",e=>{
-  if(e.key==="Escape"){closeShare();closeLightbox()}
-});
-
-document.getElementById("newsletterForm").addEventListener("submit",e=>{
-  e.preventDefault();
-  const email=document.getElementById("email"),msg=document.getElementById("newsletterMessage");
-  if(!email.validity.valid){email.focus();return}
-  email.value="";msg.textContent="You're on the list. Welcome to TrendRader.";msg.style.color="#ff4b2b";
-});
-
-if(!reducedMotion){
-  const hero=document.querySelector(".hero-media");
-  window.addEventListener("scroll",()=>{
-    const r=hero.getBoundingClientRect();
-    if(r.bottom>0&&r.top<innerHeight){
-      const offset=(innerHeight/2-r.top)*.025;
-      document.getElementById("heroImage").style.transform=`scale(1.01) translateY(${offset}px)`;
-    }
-  },{passive:true});
+  closeList();
+  if (line.trim()) html += `<p>${line}</p>`;
+  return html;
 }
 
-/* TrendRader article runtime: related-story hydration from the static publisher payload. */
-(function hydrateRelatedStories() {
-  const dataEl = document.getElementById("relatedArticlesData");
-  if (!dataEl) return;
-  try {
-    const payload = JSON.parse(dataEl.textContent || "{}");
-    const items = Array.isArray(payload.items) ? payload.items : [];
-    const grid = document.querySelector(".related-grid");
-    if (!grid || !items.length) return;
-    grid.innerHTML = items.slice(0, 3).map((item, index) => {
-      const safe = (value) => String(value ?? "").replace(/[&<>"']/g, char => ({
-        "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-      }[char]));
-      return `<a class="related-card reveal tilt-card" href="${safe(item.url || "#")}">
-        <div class="related-image">
-          <img src="${safe(item.image || "")}" alt="${safe(item.title || "Related TrendRader story")}" loading="lazy" width="1000" height="630">
-          <span>${String(index + 1).padStart(2, "0")}</span>
-        </div>
-        <div class="related-meta">
-          <span>${safe(item.tag || "News")}</span><i></i><span>${Math.max(1, Number(item.readTime || 4))} min</span>
-        </div>
-        <h3>${safe(item.title || "")}</h3>
-        <div class="related-arrow">↗</div>
-      </a>`;
-    }).join("");
-    if (!reducedMotion) {
-      grid.querySelectorAll(".reveal").forEach((el) => observer.observe(el));
+async function fetchJson(path) {
+  const response = await fetch(path, { cache: "no-store" });
+  if (!response.ok) throw new Error(`${path} returned ${response.status}`);
+  return response.json();
+}
+
+async function resolveArticle() {
+  const runtime = $("#articleRuntimeData");
+  const rawRuntime = runtime?.textContent?.trim() || "";
+  const hasTemplateTokens = /\{\{[A-Z_]+\}\}/.test(document.documentElement.innerHTML);
+  const slug = getSlugFromLocation();
+
+  if (!hasTemplateTokens && !slug) return null;
+
+  const payload = await fetchJson(ARTICLE_DB);
+  const raw = Array.isArray(payload) ? payload : Array.isArray(payload.articles) ? payload.articles : Array.isArray(payload.items) ? payload.items : [];
+  const articles = sortArticles(raw.map(normalizeArticle).filter(isPublished));
+
+  let article = slug ? articles.find((item) => item.slug === slug || item.url.endsWith(`${slug}.html`)) : articles[0];
+  if (!article) throw new Error("No published TrendRader article matches this URL.");
+
+  let bodyHtml = "";
+  if (article.bodyHtml || article.content || article.body) {
+    bodyHtml = safeBodyHtml(article.bodyHtml || article.content || article.body);
+  } else if (article.delta) {
+    try {
+      const assetPrefix = location.pathname.includes("/articles/") ? "../" : "./";
+      const deltaPath = article.delta.startsWith("http") ? article.delta : `${assetPrefix}${article.delta.replace(/^\.\//, "")}`;
+      const delta = await fetchJson(deltaPath);
+      bodyHtml = quillDeltaToHtml(delta);
+    } catch (error) {
+      console.warn("TrendRader article delta could not be loaded.", error);
     }
-  } catch (error) {
-    console.warn("TrendRader related stories could not be hydrated.", error);
   }
-})();
+
+  return { article, articles, bodyHtml, rawRuntime };
+}
+
+function hydrateArticlePage(resolved) {
+  if (!resolved) return;
+  const { article, articles, bodyHtml } = resolved;
+  const title = article.title;
+  const description = article.desc;
+  const image = article.image;
+  const category = article.category;
+  const tag = article.tag;
+  const author = article.author;
+  const read = readTime(article, bodyHtml.replace(/<[^>]+>/g, " "));
+  const canonical = article.url
+    ? `${BASE_SITE}/${article.url.replace(/^\//, "")}`
+    : `${BASE_SITE}/articles/${article.slug}.html`;
+
+  document.title = `${article.seoTitle || title} — TrendRader`;
+  setMeta('meta[name="description"]', description);
+  setMeta('meta[name="author"]', author);
+  setMeta('meta[property="og:title"]', article.seoTitle || title);
+  setMeta('meta[property="og:description"]', description);
+  setMeta('meta[property="og:url"]', canonical);
+  setMeta('meta[property="og:image"]', image);
+  setMeta('meta[name="twitter:title"]', article.seoTitle || title);
+  setMeta('meta[name="twitter:description"]', description);
+  setMeta('meta[name="twitter:image"]', image);
+  setCanonical(canonical);
+
+  const replacements = {
+    ".kicker-label": tag,
+    ".article-kicker > span:last-child": category,
+    ".article-title": title,
+    ".article-dek": description,
+    ".author strong": author,
+    ".meta-item strong": null
+  };
+  Object.entries(replacements).forEach(([selector, value]) => {
+    const el = $(selector);
+    if (el && value !== null) el.textContent = value;
+  });
+  const dateEl = $$(".meta-item strong")[0];
+  if (dateEl) dateEl.textContent = formatDate(article.date);
+  const readEl = $$(".meta-item strong")[1];
+  if (readEl) readEl.textContent = `${read} min`;
+  const hero = $("#heroImage");
+  if (hero && image) {
+    hero.src = image;
+    hero.alt = String(article.imageAlt || title);
+    hero.removeAttribute("data-template-image");
+  }
+  if (!image && hero) hero.remove();
+
+  const body = $("#articleBody");
+  if (body && bodyHtml) {
+    const tags = $("#articleTags");
+    body.innerHTML = bodyHtml;
+    if (tags) body.appendChild(tags);
+  }
+
+  const initials = author.split(/\s+/).filter(Boolean).map((part) => part[0]).join("").slice(0,2).toUpperCase() || "T";
+  ["#authorAvatar","#authorAvatarLarge"].forEach((selector) => {
+    const el = $(selector);
+    if (el) el.textContent = initials;
+  });
+  const authorName = $("#authorName");
+  if (authorName) authorName.textContent = author;
+  const authorBio = $("#authorBio");
+  if (authorBio && article.authorBio) authorBio.textContent = article.authorBio;
+
+  const tagsEl = $("#articleTags");
+  const keywords = Array.isArray(article.keywords) ? article.keywords : String(article.keywords || "").split(",").map((item) => item.trim()).filter(Boolean);
+  if (tagsEl && keywords.length) {
+    tagsEl.innerHTML = `<span>Topics</span>${keywords.slice(0,8).map((keyword) => `<a href="../index.html#latest">${escapeHtml(keyword)}</a>`).join("")}`;
+  }
+
+  buildOutline();
+  renderRelated(articles, article);
+  updateSchemaFallback(article, canonical, read);
+  if (slug && !location.pathname.endsWith(`${slug}.html`)) {
+    history.replaceState(null, "", `?slug=${encodeURIComponent(slug)}`);
+  }
+}
+
+function buildOutline() {
+  const outline = $("#storyOutline");
+  const body = $("#articleBody");
+  if (!outline || !body) return;
+  const headings = $$("h2,h3", body);
+  outline.innerHTML = headings.slice(0, 6).map((heading, index) => {
+    if (!heading.id) heading.id = `section-${index + 1}`;
+    return `<a href="#${escapeHtml(heading.id)}"><span>${String(index + 1).padStart(2,"0")}</span>${escapeHtml(heading.textContent)}</a>`;
+  }).join("");
+  if (!headings.length) outline.innerHTML = `<span class="outline-empty">Published story</span>`;
+}
+
+function renderRelated(articles, current) {
+  const grid = $("#relatedGrid");
+  if (!grid) return;
+  const candidates = articles.filter((article) => article.slug !== current.slug && article.title);
+  const currentTokens = new Set(`${current.title} ${current.desc} ${current.category} ${current.tag}`.toLowerCase().match(/[a-z0-9]{4,}/g) || []);
+  const related = candidates.map((article) => {
+    const tokens = `${article.title} ${article.desc} ${article.category} ${article.tag}`.toLowerCase().match(/[a-z0-9]{4,}/g) || [];
+    const overlap = tokens.reduce((score, token) => score + (currentTokens.has(token) ? 1 : 0), 0);
+    const sameCategory = article.category.toLowerCase() === current.category.toLowerCase() ? 4 : 0;
+    return { article, score: overlap + sameCategory };
+  }).sort((a,b) => b.score - a.score || new Date(b.article.date) - new Date(a.article.date)).slice(0,3).map((item) => item.article);
+
+  grid.innerHTML = related.map((article, index) => {
+    const image = article.image ? `<img src="${escapeHtml(article.image)}" alt="${escapeHtml(article.title)}" loading="lazy" width="1000" height="625">` : "";
+    return `<a class="related-card reveal" href="${escapeHtml(articleUrl(article))}">
+      <div class="related-image">${image}<span>${String(index + 1).padStart(2,"0")}</span></div>
+      <div class="related-meta"><span>${escapeHtml(article.tag)}</span><i></i><span>${readTime(article)} min</span></div>
+      <h3>${escapeHtml(article.title)}</h3><div class="related-arrow">↗</div>
+    </a>`;
+  }).join("");
+  observeReveals(grid);
+}
+
+function updateSchemaFallback(article, canonical, read) {
+  const existing = $$('script[type="application/ld+json"]');
+  const unresolved = existing.some((node) => /\{\{/.test(node.textContent || ""));
+  if (!unresolved) return;
+  existing.forEach((node) => node.remove());
+  const schema = {
+    "@context":"https://schema.org",
+    "@type":"NewsArticle",
+    "headline":article.title,
+    "description":article.desc,
+    "url":canonical,
+    "datePublished":article.date,
+    "dateModified":article.modified || article.date,
+    "author":{"@type":"Organization","name":article.author || "TrendRader Editorial"},
+    "publisher":{"@type":"Organization","name":"TrendRader","url":BASE_SITE,"logo":{"@type":"ImageObject","url":`${BASE_SITE}/assets/logo.svg`}},
+    "image":article.image ? [article.image] : [],
+    "articleSection":article.category,
+    "keywords":Array.isArray(article.keywords) ? article.keywords.join(", ") : String(article.keywords || ""),
+    "mainEntityOfPage":{"@type":"WebPage","@id":canonical},
+    "isAccessibleForFree":true,
+    "timeRequired":`PT${read}M`
+  };
+  const script = document.createElement("script");
+  script.type = "application/ld+json";
+  script.textContent = JSON.stringify(schema);
+  document.head.appendChild(script);
+}
+
+function setupNavigation() {
+  const menuToggle = $("#menuToggle");
+  const mobileNav = $("#mobileNav");
+  menuToggle?.addEventListener("click", () => {
+    const open = mobileNav.classList.toggle("open");
+    menuToggle.setAttribute("aria-expanded", String(open));
+  });
+  $$(".mobile-nav a").forEach((link) => link.addEventListener("click", () => {
+    mobileNav.classList.remove("open");
+    menuToggle.setAttribute("aria-expanded", "false");
+  }));
+}
+
+function setupScroll() {
+  const progress = $("#progressBar");
+  const header = $("#siteHeader");
+  const update = () => {
+    const max = document.documentElement.scrollHeight - window.innerHeight;
+    if (progress) progress.style.width = `${max > 0 ? (window.scrollY / max) * 100 : 0}%`;
+    header?.classList.toggle("scrolled", window.scrollY > 12);
+  };
+  window.addEventListener("scroll", update, { passive: true });
+  update();
+}
+
+function setupShare() {
+  const modal = $("#shareModal");
+  const open = () => { modal?.classList.add("open"); modal?.setAttribute("aria-hidden","false"); };
+  const close = () => { modal?.classList.remove("open"); modal?.setAttribute("aria-hidden","true"); };
+  $("#shareTop")?.addEventListener("click", open);
+  $("#shareRail")?.addEventListener("click", open);
+  $("#closeShare")?.addEventListener("click", close);
+  $("#shareBackdrop")?.addEventListener("click", close);
+  $$("[data-share]").forEach((button) => button.addEventListener("click", async () => {
+    const type = button.dataset.share;
+    const url = location.href;
+    const title = document.title;
+    if (type === "copy") {
+      try { await navigator.clipboard.writeText(url); $("#shareMessage").textContent = "Link copied to clipboard."; }
+      catch { $("#shareMessage").textContent = url; }
+      return;
+    }
+    const target = type === "x"
+      ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`
+      : `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
+    window.open(target, "share", "width=700,height=600,noopener,noreferrer");
+  }));
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+}
+
+function setupLightbox() {
+  const lightbox = $("#lightbox");
+  const image = $("#heroImage");
+  $("#expandImage")?.addEventListener("click", () => {
+    if (!image?.src) return;
+    $("#lightboxImage").src = image.src;
+    $("#lightboxImage").alt = image.alt;
+    lightbox?.classList.add("open");
+    lightbox?.setAttribute("aria-hidden","false");
+  });
+  const close = () => { lightbox?.classList.remove("open"); lightbox?.setAttribute("aria-hidden","true"); };
+  $("#closeLightbox")?.addEventListener("click", close);
+  lightbox?.addEventListener("click", (event) => { if (event.target === lightbox) close(); });
+  document.addEventListener("keydown", (event) => { if (event.key === "Escape") close(); });
+}
+
+function setupNewsletter() {
+  $("#newsletterForm")?.addEventListener("submit", (event) => {
+    event.preventDefault();
+    const email = $("#email");
+    const message = $("#newsletterMessage");
+    if (!email?.validity.valid) { email?.focus(); return; }
+    email.value = "";
+    message.textContent = "You're on the list. Welcome to TrendRader.";
+  });
+}
+
+function setupCursor() {
+  const glow = $(".cursor-glow");
+  if (!glow || reducedMotion || !window.matchMedia("(hover:hover)").matches) return;
+  window.addEventListener("pointermove", (event) => {
+    glow.style.left = `${event.clientX}px`;
+    glow.style.top = `${event.clientY}px`;
+  }, { passive: true });
+}
+
+function observeReveals(root = document) {
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add("visible");
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.08, rootMargin: "0px 0px -30px" });
+  $$(".reveal", root).forEach((element, index) => {
+    if (!reducedMotion) element.style.transitionDelay = `${Math.min(index * 40, 220)}ms`;
+    observer.observe(element);
+  });
+}
+
+async function init() {
+  setupNavigation();
+  setupScroll();
+  setupShare();
+  setupLightbox();
+  setupNewsletter();
+  setupCursor();
+  $("#footerYear").textContent = new Date().getFullYear();
+
+  try {
+    const resolved = await resolveArticle();
+    if (resolved) hydrateArticlePage(resolved);
+  } catch (error) {
+    console.error("TrendRader article load failed:", error);
+    document.title = "TrendRader — Article";
+    setMeta('meta[name="robots"]', "noindex, follow");
+    const body = $("#articleBody");
+    if (body) body.innerHTML = `<div class="article-load-error"><p>This article could not be loaded from the published TrendRader feed.</p><a href="../index.html">Return to TrendRader</a></div>`;
+  }
+  observeReveals();
+}
+
+init();
