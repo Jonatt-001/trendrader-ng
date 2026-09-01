@@ -4,21 +4,31 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
   <meta name="description" content="TrendRader delivers breaking news, politics, technology, business, entertainment, sports and trending stories from Nigeria and around the world.">
-  <meta name="theme-color" content="#f5f3ee">
+  <meta name="theme-color" content="#f3f1eb">
   <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1">
   <meta name="author" content="TrendRader Editorial">
+
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="TrendRader">
   <meta property="og:title" content="TrendRader — Nigeria & World News">
   <meta property="og:description" content="Breaking news, politics, technology, business, entertainment, sports and trending stories from Nigeria and around the world.">
   <meta property="og:url" content="https://trendrader.space/">
   <meta property="og:locale" content="en_NG">
+  <meta property="og:image" content="https://trendrader.space/assets/og-image.jpg">
+
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:title" content="TrendRader — Nigeria & World News">
   <meta name="twitter:description" content="Breaking news, politics, technology, business, entertainment, sports and trending stories from Nigeria and around the world.">
+  <meta name="twitter:image" content="https://trendrader.space/assets/og-image.jpg">
+
   <link rel="canonical" href="https://trendrader.space/">
   <link rel="alternate" type="application/rss+xml" title="TrendRader RSS" href="./rss.xml">
   <link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+
   <script type="application/ld+json">
   {
     "@context":"https://schema.org",
@@ -38,32 +48,55 @@
         "@id":"https://trendrader.space/#website",
         "url":"https://trendrader.space/",
         "name":"TrendRader",
-        "publisher":{"@id":"https://trendrader.space/#organization"},
-        "inLanguage":"en-NG"
+        "publisher":{
+          "@id":"https://trendrader.space/#organization"
+        },
+        "inLanguage":"en-NG",
+        "potentialAction":{
+          "@type":"SearchAction",
+          "target":"https://trendrader.space/?q={search_term_string}",
+          "query-input":"required name=search_term_string"
+        }
       },
       {
         "@type":"CollectionPage",
         "@id":"https://trendrader.space/#webpage",
         "url":"https://trendrader.space/",
         "name":"TrendRader — Nigeria & World News",
-        "isPartOf":{"@id":"https://trendrader.space/#website"}
+        "isPartOf":{
+          "@id":"https://trendrader.space/#website"
+        },
+        "about":{
+          "@id":"https://trendrader.space/#organization"
+        }
       }
     ]
   }
   </script>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,400;6..72,500;6..72,600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+  <a class="skip-link" href="#mainContent">Skip to content</a>
+
   <div class="cursor-glow" aria-hidden="true"></div>
+
+  <div class="reading-progress" aria-hidden="true">
+    <span id="progressBar"></span>
+  </div>
 
   <header class="site-header" id="siteHeader">
     <div class="header-inner">
+
       <a class="brand" href="./index.html" aria-label="TrendRader home">
-        <span class="brand-mark">T</span>
-        <span class="brand-name">TRENDRADER</span>
+        <span class="brand-mark" aria-hidden="true">
+          <svg viewBox="0 0 48 48" role="img">
+            <path d="M11 12h26v5H27v20h-6V17H11z"></path>
+          </svg>
+        </span>
+        <span class="brand-lockup">
+          <span class="brand-name">TRENDRADER</span>
+          <span class="brand-subtitle">NEWS / CULTURE / SIGNAL</span>
+        </span>
       </a>
 
       <nav class="desktop-nav" aria-label="Primary navigation">
@@ -72,143 +105,512 @@
         <a href="#politics">Politics</a>
         <a href="#technology">Technology</a>
         <a href="#business">Business</a>
-        <a href="#entertainment">Entertainment</a>
+        <a href="#entertainment">Culture</a>
         <a href="#sports">Sports</a>
         <a href="#trending">Trending</a>
       </nav>
 
       <div class="header-actions">
-        <button class="icon-button" id="searchToggle" type="button" aria-label="Open search" aria-expanded="false" aria-controls="searchPanel">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-4-4"></path></svg>
+
+        <button
+          class="icon-button"
+          id="searchToggle"
+          type="button"
+          aria-label="Open search"
+          aria-expanded="false"
+          aria-controls="searchPanel"
+        >
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.8" cy="10.8" r="6.8"></circle>
+            <path d="m16 16 5 5"></path>
+          </svg>
         </button>
-        <button class="menu-button" id="menuToggle" type="button" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav">
-          <span></span><span></span>
+
+        <button
+          class="menu-button"
+          id="menuToggle"
+          type="button"
+          aria-label="Open menu"
+          aria-expanded="false"
+          aria-controls="mobileNav"
+        >
+          <span></span>
+          <span></span>
         </button>
+
       </div>
     </div>
 
     <div class="search-panel" id="searchPanel" aria-hidden="true">
-      <form id="searchForm">
+      <form id="searchForm" role="search">
         <label class="search-input-wrap" for="searchInput">
           <span class="search-index">SEARCH</span>
-          <input id="searchInput" type="search" placeholder="Search published stories..." autocomplete="off">
+
+          <input
+            id="searchInput"
+            type="search"
+            placeholder="Search published stories..."
+            autocomplete="off"
+            enterkeyhint="search"
+          >
         </label>
-        <button type="submit">Search <span>↗</span></button>
+
+        <button type="submit">
+          Search
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13"></path>
+            <path d="m13 7 5 5-5 5"></path>
+          </svg>
+        </button>
       </form>
     </div>
 
     <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
-      <a href="./index.html"><span>01</span>Home</a>
-      <a href="#latest"><span>02</span>Latest</a>
-      <a href="#politics"><span>03</span>Politics</a>
-      <a href="#technology"><span>04</span>Technology</a>
-      <a href="#business"><span>05</span>Business</a>
-      <a href="#entertainment"><span>06</span>Entertainment</a>
-      <a href="#sports"><span>07</span>Sports</a>
-      <a href="#trending"><span>08</span>Trending</a>
+      <a href="./index.html">
+        <span>01</span>
+        <strong>Home</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
+
+      <a href="#latest">
+        <span>02</span>
+        <strong>Latest</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
+
+      <a href="#politics">
+        <span>03</span>
+        <strong>Politics</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
+
+      <a href="#technology">
+        <span>04</span>
+        <strong>Technology</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
+
+      <a href="#business">
+        <span>05</span>
+        <strong>Business</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
+
+      <a href="#entertainment">
+        <span>06</span>
+        <strong>Culture</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
+
+      <a href="#sports">
+        <span>07</span>
+        <strong>Sports</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
+
+      <a href="#trending">
+        <span>08</span>
+        <strong>Trending</strong>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
     </nav>
   </header>
 
   <div class="ticker" id="liveTicker" hidden>
-    <div class="ticker-label"><span></span>LIVE</div>
+    <div class="ticker-label">
+      <span class="live-dot"></span>
+      LIVE
+    </div>
     <div class="ticker-track" id="tickerTrack"></div>
   </div>
 
-  <main>
-    <section class="hero section-wrap">
+  <main id="mainContent">
+
+    <section class="hero section-wrap" aria-labelledby="heroTitle">
+
       <div class="hero-copy reveal">
-        <div class="hero-kicker"><span>THE TRENDRADER DAILY</span><i></i><span id="todayLabel">NEWS DESK</span></div>
-        <h1>News that helps you <em>see what matters.</em></h1>
-        <p class="hero-intro">Independent digital journalism covering Nigeria, Africa and the world — with speed, clarity and context.</p>
-        <div class="hero-meta"><span id="heroDate">Latest published stories</span><span class="meta-dot"></span><span>Independent journalism</span></div>
+        <div class="hero-kicker">
+          <span>THE TRENDRADER DAILY</span>
+          <i></i>
+          <span id="todayLabel">NEWS DESK</span>
+        </div>
+
+        <h1 id="heroTitle">
+          News that helps you
+          <em>see what matters.</em>
+        </h1>
+
+        <p class="hero-intro">
+          Independent digital journalism covering Nigeria, Africa and the world — with speed, clarity and context.
+        </p>
+
+        <div class="hero-meta">
+          <span id="heroDate">Latest published stories</span>
+          <span class="meta-dot"></span>
+          <span>Independent journalism</span>
+        </div>
+
+        <div class="hero-actions">
+          <a class="primary-button" href="#latest">
+            <span>Explore latest</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h13"></path>
+              <path d="m13 7 5 5-5 5"></path>
+            </svg>
+          </a>
+
+          <a class="quiet-link" href="#trending">
+            <span class="quiet-link-dot"></span>
+            What's moving
+          </a>
+        </div>
       </div>
 
       <div id="leadStoryMount" class="lead-story-mount"></div>
+
     </section>
 
-    <section class="section-wrap section-block" id="latest">
+    <section class="section-wrap section-block" id="latest" aria-labelledby="latestHeading">
+
       <div class="section-heading reveal">
         <div>
-          <div class="section-eyebrow"><span>01</span>NOW</div>
-          <h2>Latest stories</h2>
+          <div class="section-eyebrow">
+            <span>01</span>
+            NOW
+          </div>
+          <h2 id="latestHeading">Latest stories</h2>
         </div>
-        <span class="feed-status" id="feedStatus">Loading published stories...</span>
+
+        <span class="feed-status" id="feedStatus">
+          Loading published stories...
+        </span>
       </div>
+
       <div class="story-grid" id="latestGrid" aria-live="polite"></div>
+
     </section>
 
-    <section class="category-section section-wrap" id="politics" data-category="politics">
-      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>02</span>NIGERIA</div><h2>Politics</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+    <section
+      class="category-section section-wrap"
+      id="politics"
+      data-category="politics"
+      aria-labelledby="politicsHeading"
+    >
+      <div class="section-heading reveal">
+        <div>
+          <div class="section-eyebrow">
+            <span>02</span>
+            NIGERIA
+          </div>
+          <h2 id="politicsHeading">Politics</h2>
+        </div>
+
+        <a class="view-all" href="#latest">
+          Latest
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13"></path>
+            <path d="m13 7 5 5-5 5"></path>
+          </svg>
+        </a>
+      </div>
+
       <div class="category-grid" id="politicsGrid"></div>
     </section>
 
-    <section class="dark-feature" id="technology" data-category="technology">
+    <section
+      class="dark-feature"
+      id="technology"
+      data-category="technology"
+      aria-labelledby="technologyHeading"
+    >
       <div class="section-wrap dark-inner">
+
         <div class="dark-copy reveal">
-          <div class="dark-kicker"><span>03</span>TECHNOLOGY</div>
-          <h2>Technology, AI and the systems changing <em>what comes next.</em></h2>
-          <p>Follow the people, products and decisions shaping the digital economy.</p>
+          <div class="dark-kicker">
+            <span>03</span>
+            TECHNOLOGY
+          </div>
+
+          <h2 id="technologyHeading">
+            Technology, AI and the systems changing
+            <em>what comes next.</em>
+          </h2>
+
+          <p>
+            Follow the people, products and decisions shaping the digital economy.
+          </p>
+
+          <a class="dark-link" href="#latest">
+            Explore technology
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h13"></path>
+              <path d="m13 7 5 5-5 5"></path>
+            </svg>
+          </a>
         </div>
+
         <div class="dark-stories" id="technologyGrid"></div>
+
       </div>
     </section>
 
-    <section class="category-section section-wrap" id="business" data-category="business">
-      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>04</span>ECONOMY</div><h2>Business</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+    <section
+      class="category-section section-wrap"
+      id="business"
+      data-category="business"
+      aria-labelledby="businessHeading"
+    >
+      <div class="section-heading reveal">
+        <div>
+          <div class="section-eyebrow">
+            <span>04</span>
+            ECONOMY
+          </div>
+          <h2 id="businessHeading">Business</h2>
+        </div>
+
+        <a class="view-all" href="#latest">
+          Latest
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13"></path>
+            <path d="m13 7 5 5-5 5"></path>
+          </svg>
+        </a>
+      </div>
+
       <div class="category-grid" id="businessGrid"></div>
     </section>
 
-    <section class="category-section section-wrap" id="entertainment" data-category="entertainment">
-      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>05</span>CULTURE</div><h2>Entertainment</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+    <section
+      class="category-section section-wrap"
+      id="entertainment"
+      data-category="entertainment"
+      aria-labelledby="entertainmentHeading"
+    >
+      <div class="section-heading reveal">
+        <div>
+          <div class="section-eyebrow">
+            <span>05</span>
+            CULTURE
+          </div>
+          <h2 id="entertainmentHeading">Entertainment</h2>
+        </div>
+
+        <a class="view-all" href="#latest">
+          Latest
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13"></path>
+            <path d="m13 7 5 5-5 5"></path>
+          </svg>
+        </a>
+      </div>
+
       <div class="category-grid" id="entertainmentGrid"></div>
     </section>
 
-    <section class="category-section section-wrap" id="sports" data-category="sports">
-      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>06</span>SPORT</div><h2>Sports</h2></div><a class="view-all" href="#latest">Latest <span>↗</span></a></div>
+    <section
+      class="category-section section-wrap"
+      id="sports"
+      data-category="sports"
+      aria-labelledby="sportsHeading"
+    >
+      <div class="section-heading reveal">
+        <div>
+          <div class="section-eyebrow">
+            <span>06</span>
+            SPORT
+          </div>
+          <h2 id="sportsHeading">Sports</h2>
+        </div>
+
+        <a class="view-all" href="#latest">
+          Latest
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13"></path>
+            <path d="m13 7 5 5-5 5"></path>
+          </svg>
+        </a>
+      </div>
+
       <div class="category-grid" id="sportsGrid"></div>
     </section>
 
-    <section class="category-section section-wrap" id="trending" data-category="trending">
-      <div class="section-heading reveal"><div><div class="section-eyebrow"><span>07</span>NOW MOVING</div><h2>Trending</h2></div><a class="view-all" href="#latest">All stories <span>↗</span></a></div>
+    <section
+      class="category-section section-wrap"
+      id="trending"
+      data-category="trending"
+      aria-labelledby="trendingHeading"
+    >
+      <div class="section-heading reveal">
+        <div>
+          <div class="section-eyebrow">
+            <span>07</span>
+            NOW MOVING
+          </div>
+          <h2 id="trendingHeading">Trending</h2>
+        </div>
+
+        <a class="view-all" href="#latest">
+          All stories
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13"></path>
+            <path d="m13 7 5 5-5 5"></path>
+          </svg>
+        </a>
+      </div>
+
       <div class="category-grid" id="trendingGrid"></div>
     </section>
 
     <section class="empty-state section-wrap" id="emptyState" hidden>
       <div class="empty-index">TRENDRADER / NEWS DESK</div>
+
+      <div class="empty-icon" aria-hidden="true">
+        <svg viewBox="0 0 32 32">
+          <path d="M7 6h18v20H7z"></path>
+          <path d="M11 11h10"></path>
+          <path d="M11 15h10"></path>
+          <path d="M11 19h6"></path>
+        </svg>
+      </div>
+
       <h2>No published stories yet.</h2>
-      <p>Published stories from the TrendRader editorial system will appear here automatically. Drafts and unpublished records are never shown on the public feed.</p>
-      <a href="./admin/index.html">Open Editorial Desk <span>↗</span></a>
+
+      <p>
+        Published stories from the TrendRader editorial system will appear here automatically.
+        Drafts and unpublished records are never shown on the public feed.
+      </p>
+
+      <a href="./admin/index.html">
+        Open Editorial Desk
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M5 12h13"></path>
+          <path d="m13 7 5 5-5 5"></path>
+        </svg>
+      </a>
     </section>
 
-    <section class="newsletter section-wrap reveal" id="newsletter">
+    <section class="newsletter section-wrap reveal" id="newsletter" aria-labelledby="newsletterHeading">
+
       <div class="newsletter-copy">
-        <div class="newsletter-eyebrow"><span></span>THE TRENDRADER BRIEF</div>
-        <h2>Know what matters. <em>Stay ahead.</em></h2>
-        <p>A concise briefing of the stories, ideas and developments worth your attention.</p>
+
+        <div class="newsletter-eyebrow">
+          <span></span>
+          THE TRENDRADER BRIEF
+        </div>
+
+        <h2 id="newsletterHeading">
+          Know what matters.
+          <em>Stay ahead.</em>
+        </h2>
+
+        <p>
+          A concise briefing of the stories, ideas and developments worth your attention.
+        </p>
+
       </div>
+
       <form id="newsletterForm">
+
         <div class="newsletter-field">
           <label for="newsletterEmail">Email address</label>
-          <input id="newsletterEmail" type="email" placeholder="you@example.com" autocomplete="email" required>
+
+          <input
+            id="newsletterEmail"
+            type="email"
+            placeholder="you@example.com"
+            autocomplete="email"
+            inputmode="email"
+            required
+          >
         </div>
-        <button type="submit">Subscribe <span>↗</span></button>
-        <small id="newsletterMessage">No noise. Unsubscribe anytime.</small>
+
+        <button type="submit">
+          Subscribe
+
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M5 12h13"></path>
+            <path d="m13 7 5 5-5 5"></path>
+          </svg>
+        </button>
+
+        <small id="newsletterMessage">
+          No noise. Unsubscribe anytime.
+        </small>
+
       </form>
     </section>
+
   </main>
 
   <footer class="site-footer">
+
     <div class="section-wrap footer-top">
+
       <div class="footer-brand">
-        <a class="brand" href="./index.html"><span class="brand-mark">T</span><span class="brand-name">TRENDRADER</span></a>
-        <p>Independent digital news for Nigeria and the world.</p>
+        <a class="brand" href="./index.html" aria-label="TrendRader home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 48 48">
+              <path d="M11 12h26v5H27v20h-6V17H11z"></path>
+            </svg>
+          </span>
+
+          <span class="brand-lockup">
+            <span class="brand-name">TRENDRADER</span>
+            <span class="brand-subtitle">NEWS / CULTURE / SIGNAL</span>
+          </span>
+        </a>
+
+        <p>
+          Independent digital news for Nigeria and the world.
+        </p>
       </div>
-      <div class="footer-index"><span>EST. 2026</span><span>INDEPENDENT / DIGITAL</span></div>
+
+      <div class="footer-index">
+        <span>EST. 2026</span>
+        <span>INDEPENDENT / DIGITAL</span>
+      </div>
+
     </div>
+
     <div class="section-wrap footer-bottom">
-      <span>© <span id="footerYear">2026</span> TrendRader Media</span>
-      <div><a href="#">Privacy</a><a href="#">Terms</a><a href="#">Contact</a></div>
+
+      <span>
+        © <span id="footerYear">2026</span> TrendRader Media
+      </span>
+
+      <div>
+        <a href="#">Privacy</a>
+        <a href="#">Terms</a>
+        <a href="mailto:editorial@trendrader.space">Contact</a>
+      </div>
+
     </div>
+
   </footer>
 
   <script src="./script.js"></script>
