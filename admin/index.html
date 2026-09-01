@@ -606,10 +606,27 @@ let lastPreflight = null;
 let lastAutosaveAt = 0;
 
 const CLOUDINARY_CONFIG = {
-    cloudName: '',
-    uploadPreset: '',
-    endpoint: 'https://api.cloudinary.com/v1_1//image/upload'
+    cloudName: 'dxdbn6xwy',
+    uploadPreset: 'geefox_unsigned',
+    endpoint: 'https://api.cloudinary.com/v1_1/dxdbn6xwy/image/upload'
 };
+
+function getCloudinaryConfig() {
+    try {
+        const settings = JSON.parse(localStorage.getItem('trendrader-settings') || '{}');
+        const cloudName = String(settings.cloudName || CLOUDINARY_CONFIG.cloudName).trim();
+        const uploadPreset = String(settings.uploadPreset || CLOUDINARY_CONFIG.uploadPreset).trim();
+        return {
+            cloudName,
+            uploadPreset,
+            endpoint: cloudName
+                ? `https://api.cloudinary.com/v1_1/${encodeURIComponent(cloudName)}/image/upload`
+                : CLOUDINARY_CONFIG.endpoint
+        };
+    } catch (error) {
+        return { ...CLOUDINARY_CONFIG };
+    }
+}
 
 /* ============================================================
    TRENDRADER IMAGE BRANDING
@@ -4124,9 +4141,15 @@ async function uploadImageToCloudinary(file, title, kind, contextLabel) {
        We therefore keep the SEO-friendly filename locally and request the
        deterministic public ID directly.
     */
+    const cloudinary = getCloudinaryConfig();
+
+    if (!cloudinary.cloudName || !cloudinary.uploadPreset) {
+        throw new Error('Cloudinary is not configured. Set the Cloud Name and Upload Preset in Admin Settings.');
+    }
+
     const formData = new FormData();
     formData.append('file', renamedFile, renamedFile.name);
-    formData.append('upload_preset', CLOUDINARY_CONFIG.uploadPreset);
+    formData.append('upload_preset', cloudinary.uploadPreset);
     formData.append('public_id', requestedPublicId);
     formData.append('filename_override', renamedFile.name);
     formData.append('tags', `trendrader,trendrader-watermarked,${kind}`);
@@ -4135,7 +4158,7 @@ async function uploadImageToCloudinary(file, title, kind, contextLabel) {
     let data;
 
     try {
-        response = await fetch(CLOUDINARY_CONFIG.endpoint, {
+        response = await fetch(cloudinary.endpoint, {
             method: 'POST',
             body: formData
         });
@@ -4155,13 +4178,13 @@ async function uploadImageToCloudinary(file, title, kind, contextLabel) {
 
         if (/public.?id.*(not allowed|disallow)|disallow.*public.?id/i.test(message)) {
             throw new Error(
-                `Cloudinary upload preset "${CLOUDINARY_CONFIG.uploadPreset}" is configured to disallow custom public IDs. Enable public_id/custom public IDs for this unsigned preset, then try again.`
+                `Cloudinary upload preset "${cloudinary.uploadPreset}" is configured to disallow custom public IDs. Enable public_id/custom public IDs for this unsigned preset, then try again.`
             );
         }
 
         if (/not allowed|unsupported parameter|unsigned/i.test(message)) {
             throw new Error(
-                `Cloudinary rejected an upload parameter. The editor now sends only parameters supported by unsigned uploads. If this persists, check the "${CLOUDINARY_CONFIG.uploadPreset}" preset configuration. ${message}`.trim()
+                `Cloudinary rejected an upload parameter. The editor now sends only parameters supported by unsigned uploads. If this persists, check the "${cloudinary.uploadPreset}" preset configuration. ${message}`.trim()
             );
         }
 
