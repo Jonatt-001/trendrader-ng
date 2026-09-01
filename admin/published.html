@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Published — TrendRader Editor</title>
+<meta name="robots" content="noindex,nofollow">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#0b0c10;--muted:#667085;--line:#e7e8ec;--panel:#fff;--soft:#f6f7f9;--accent:#f15e50;--accent2:#d94a3e;--green:#12a66a}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:#f6f7f9;color:var(--ink);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}.shell{min-height:100vh}.top{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.94);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}.topin{max-width:1220px;margin:auto;padding:0 22px;height:68px;display:flex;align-items:center;justify-content:space-between;gap:18px}.brand{font-weight:900;letter-spacing:.08em}.brand b{color:var(--accent)}.nav{display:flex;gap:6px;align-items:center}.nav a{padding:9px 12px;border-radius:9px;color:#667085;text-decoration:none;font-size:13px;font-weight:700}.nav a:hover,.nav a.active{background:#f3f4f6;color:#111827}.actions{display:flex;gap:8px}.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--line);background:#fff;color:#344054;border-radius:10px;padding:10px 14px;text-decoration:none;font-size:12px;font-weight:800;cursor:pointer}.btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}.btn.primary:hover{background:var(--accent2)}.main{max-width:1220px;margin:auto;padding:34px 22px 70px}.eyebrow{font-size:10px;font-weight:900;letter-spacing:.14em;text-transform:uppercase;color:var(--accent)}h1{font-size:36px;line-height:1.1;margin:7px 0 10px;letter-spacing:-.035em}h2{margin:0}.sub{color:var(--muted);max-width:720px;line-height:1.65}.toolbar{display:flex;justify-content:space-between;gap:14px;align-items:center;margin:26px 0 16px;flex-wrap:wrap}.search{min-width:280px;padding:11px 13px;border:1px solid var(--line);border-radius:10px;background:#fff;outline:none}.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}.stat{background:#fff;border:1px solid var(--line);border-radius:14px;padding:16px}.stat strong{display:block;font-size:24px}.stat span{font-size:10px;color:#98a2b3;text-transform:uppercase;letter-spacing:.08em;font-weight:800}.list{display:grid;gap:10px}.row{background:#fff;border:1px solid var(--line);border-radius:14px;padding:15px;display:grid;grid-template-columns:92px 1fr auto;gap:15px;align-items:center}.thumb{width:92px;height:70px;border-radius:10px;overflow:hidden;background:#eef0f3}.thumb img{width:100%;height:100%;object-fit:cover}.meta{font-size:10px;color:#98a2b3;text-transform:uppercase;letter-spacing:.06em;font-weight:800}.title{font-size:16px;font-weight:850;margin:5px 0}.desc{font-size:12px;color:#667085;line-height:1.5}.badge{display:inline-flex;padding:5px 8px;border-radius:999px;background:#eefbf5;color:#087443;font-size:10px;font-weight:900}.empty{padding:60px 24px;text-align:center;background:#fff;border:1px dashed #d8dce3;border-radius:16px;color:#667085}.empty h2{color:#111827;margin-bottom:7px}.footer{max-width:1220px;margin:auto;padding:0 22px 30px;color:#98a2b3;font-size:11px}@media(max-width:760px){.nav{display:none}.stats{grid-template-columns:repeat(2,1fr)}.row{grid-template-columns:1fr}.thumb{width:100%;height:150px}.main{padding:25px 16px 55px}.topin{padding:0 16px}.actions .secondary{display:none}h1{font-size:30px}}
+</style>
+</head>
+<body><div class="shell">
+<header class="top"><div class="topin">
+<a class="brand" href="./index.html" aria-label="TrendRader Editor">TRENDRADER<span> / </span><b>EDITOR</b></a>
+<nav class="nav"><a href="./index.html">Dashboard</a><a class="active" href="./published.html">Published</a><a href="./draft.html">Drafts</a><a href="./settings.html">Settings</a></nav>
+<div class="actions"><a class="btn secondary" href="../index.html">View site</a><a class="btn primary" href="./index.html">New story</a></div>
+</div></header>
+<main class="main">
+<div class="eyebrow">Content operations</div><h1>Published stories</h1><p class="sub">Manage the canonical editorial record published by TrendRader. This view is read-only; editorial design remains publisher-owned.</p>
+<div class="stats"><div class="stat"><strong id="count">0</strong><span>Published</span></div><div class="stat"><strong id="today">0</strong><span>Published today</span></div><div class="stat"><strong id="categories">0</strong><span>Categories</span></div><div class="stat"><strong id="latest">—</strong><span>Latest date</span></div></div>
+<div class="toolbar"><input id="search" class="search" type="search" placeholder="Search title, category, author..."><span id="status" class="meta">Loading publication index…</span></div>
+<div id="list" class="list"></div>
+</main><div class="footer">TrendRader Editorial System · trendrader.space · Content only; homepage and article presentation remain template-controlled.</div>
+</div>
+<script>
+const KEY="trendrader-settings";
+const $=id=>document.getElementById(id);
+function esc(v){return String(v??"").replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]))}
+function settings(){try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch{return {}}}
+async function load() {
+ const s=settings(), repo=s.githubRepo, branch=s.githubBranch||"main", token=s.githubToken;
+ if(!repo){ render([],"Connect a GitHub repository in Settings to load published stories."); return; }
+ const headers={Accept:"application/vnd.github+json"}; if(token) headers.Authorization="Bearer "+token;
+ try {
+   const r=await fetch("https://api.github.com/repos/"+repo+"/contents/assets/articles.json?ref="+encodeURIComponent(branch),{headers});
+   if(!r.ok) throw new Error("GitHub returned "+r.status);
+   const meta=await r.json(); const text=meta.content?decodeURIComponent(escape(atob(meta.content.replace(/\s/g,"")))):"[]";
+   render(JSON.parse(text),"Connected");
+ } catch(e){render([],"Unable to load publication index: "+e.message)}
+}
+function render(raw,status) {
+ const articles=Array.isArray(raw)?raw.filter(Boolean).sort((a,b)=>new Date(b.date)-new Date(a.date)):[];
+ $("status").textContent=status;
+ $("count").textContent=articles.length;
+ const today=new Date().toISOString().slice(0,10); $("today").textContent=articles.filter(a=>String(a.date).slice(0,10)===today).length;
+ $("categories").textContent=new Set(articles.map(a=>a.category).filter(Boolean)).size;
+ $("latest").textContent=articles[0]?.date||"—";
+ const paint=()=>{const q=$("search").value.toLowerCase().trim();const rows=articles.filter(a=>(a.title+" "+a.category+" "+a.author+" "+a.contentType).toLowerCase().includes(q));$("list").innerHTML=rows.length?rows.map((a,i)=>`<article class="row"><div class="thumb"><img src="${esc(a.image||"../assets/favicon.svg")}" alt="" loading="lazy"></div><div><div class="meta">${esc(a.category||"Unclassified")} · ${esc(a.contentType||"News")}</div><div class="title">${esc(a.title)}</div><div class="desc">${esc(a.desc||"")}</div><div class="meta">${esc(a.author||"TrendRader Editorial")} · ${esc(a.date||"")} · ${Math.max(1,Number(a.readTime||4))} min</div></div><div><span class="badge">Published</span><div style="margin-top:9px"><a class="btn" href="../${esc(a.url||"")}" target="_blank" rel="noopener">Open ↗</a></div></div></article>`).join(""):`<div class="empty"><h2>No published stories found</h2><p>${q?"Try another search.":"Publish your first story from the editor."}</p></div>`};
+ paint(); $("search").addEventListener("input",paint);
+}
+load();
+</script>
+</body></html>
