@@ -1228,31 +1228,34 @@
 
     if (!elements.length) return;
 
+    elements.forEach((element) => {
+      element.classList.add("visible");
+      element.style.opacity = "1";
+      element.style.transform = "none";
+    });
+
     if (reducedMotion || !("IntersectionObserver" in window)) {
-      elements.forEach((element) => {
-        element.classList.add("visible");
-        element.style.opacity = "1";
-        element.style.transform = "none";
-      });
       return;
     }
 
-    const observer = new IntersectionObserver(
-      (entries, instance) => {
-        entries.forEach((entry) => {
-          if (!entry.isIntersecting) return;
+    elements.forEach((element, index) => {
+      if (element.dataset.revealAnimated === "true") return;
 
-          entry.target.classList.add("visible");
-          instance.unobserve(entry.target);
-        });
-      },
-      {
-        rootMargin: "0px 0px -8% 0px",
-        threshold: 0.05
-      }
-    );
+      element.dataset.revealAnimated = "true";
 
-    elements.forEach((element) => observer.observe(element));
+      element.animate(
+        [
+          { opacity: 0, transform: "translateY(10px)" },
+          { opacity: 1, transform: "translateY(0)" }
+        ],
+        {
+          duration: 420,
+          delay: Math.min(index * 35, 140),
+          easing: "cubic-bezier(.22,1,.36,1)",
+          fill: "both"
+        }
+      );
+    });
   };
 
   const setupNavigation = () => {
@@ -1501,6 +1504,7 @@
     });
   };
 
+  observeReveals(document);
   setupYear();
   setupNavigation();
   setupNewsletter();
