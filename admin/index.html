@@ -207,6 +207,30 @@
             .fab-button { bottom: calc(24px + env(safe-area-inset-bottom)); }
             .fab-drawer { bottom: calc(90px + env(safe-area-inset-bottom)); }
         }
+    
+
+/* ============================================================
+   TRENDRADER EDITORIAL WORKSPACE UX 2.0
+   Mobile-first, progressive disclosure, explicit workflow state.
+   ============================================================ */
+:root{--tr-ink:#0b0b1f;--tr-paper:#fffdfa;--tr-accent:#e86150;--tr-line:#e7e9ef;--tr-muted:#6b7280;--tr-green:#16a34a;--tr-yellow:#ca8a04;--tr-red:#dc2626}
+body{padding-bottom:88px}
+.tr-workflow{position:sticky;top:80px;z-index:40;width:min(1240px,calc(100% - 24px));margin:12px auto 0;padding:12px;background:rgba(255,255,255,.94);backdrop-filter:blur(14px);border:1px solid var(--tr-line);border-radius:16px;box-shadow:0 12px 35px rgba(15,23,42,.08);display:flex;flex-direction:column;gap:10px}
+.tr-workflow-main{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0}.tr-workflow-identity{display:flex;flex-direction:column;min-width:0}.tr-workflow-eyebrow{font-size:9px;font-weight:900;letter-spacing:.16em;color:var(--tr-accent)}#workflowTitle{font-size:14px;color:var(--tr-ink);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}#workflowSubline{font-size:10px;color:var(--tr-muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:2px}.tr-workflow-status{display:flex;align-items:center;gap:7px;white-space:nowrap;font-size:10px;font-weight:800;color:#374151}.tr-status-dot{width:8px;height:8px;border-radius:50%;background:#94a3b8;box-shadow:0 0 0 3px rgba(148,163,184,.12)}.tr-status-dot.busy{background:#eab308;box-shadow:0 0 0 3px rgba(234,179,8,.14);animation:trPulse 1.2s infinite}.tr-status-dot.ready{background:#22c55e;box-shadow:0 0 0 3px rgba(34,197,94,.12)}.tr-status-dot.error{background:#ef4444;box-shadow:0 0 0 3px rgba(239,68,68,.12)}.tr-status-time{font-weight:600;color:#9ca3af}.tr-workflow-actions{display:grid;grid-template-columns:1fr 1fr 1.35fr;gap:7px}.tr-action{min-height:40px;border-radius:10px;padding:0 10px;border:1px solid #d9dee8;font-size:11px;font-weight:900;cursor:pointer}.tr-action.secondary{background:#fff;color:#374151}.tr-action.primary{border-color:var(--tr-accent);background:var(--tr-accent);color:#fff}.tr-action:disabled{opacity:.55;cursor:not-allowed}
+.tr-stepper{width:min(1240px,calc(100% - 24px));margin:14px auto 0;display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.tr-step{border:1px solid var(--tr-line);background:#fff;border-radius:10px;padding:8px 5px;display:flex;align-items:center;justify-content:center;gap:5px;color:#94a3b8;font-size:9px;font-weight:800}.tr-step span{width:18px;height:18px;border-radius:50%;display:grid;place-items:center;background:#f1f5f9;color:#64748b;font-size:9px}.tr-step.active{border-color:rgba(232,97,80,.35);color:var(--tr-accent);background:#fff8f6}.tr-step.active span{background:var(--tr-accent);color:#fff}.tr-step.done{color:#15803d;border-color:#bbf7d0}.tr-step.done span{background:#dcfce7;color:#15803d}
+.tr-section{border:1px solid #e4e7ee!important;border-radius:16px!important;background:#fff!important;box-shadow:0 8px 25px rgba(15,23,42,.04);overflow:hidden}.tr-section.tr-open{box-shadow:0 10px 30px rgba(15,23,42,.06)}.tr-section-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 16px;border:0;background:#fff;text-align:left;cursor:pointer}.tr-section-head:hover{background:#fbfcfe}.tr-section-title{display:flex;align-items:center;gap:10px;min-width:0}.tr-section-num{width:25px;height:25px;border-radius:8px;background:#f4f5f7;color:#6b7280;display:grid;place-items:center;font-size:9px;font-weight:900}.tr-section.tr-open .tr-section-num{background:#fff0ed;color:var(--tr-accent)}.tr-section-label{display:flex;flex-direction:column;min-width:0}.tr-section-label strong{font-size:13px;color:#111827}.tr-section-label span{font-size:9px;color:#9ca3af;margin-top:2px}.tr-section-chevron{font-size:16px;color:#9ca3af;transition:transform .2s ease}.tr-section.tr-open .tr-section-chevron{transform:rotate(180deg)}.tr-section-body{padding:0 16px 16px}.tr-section[data-section-key="story"] .tr-section-body{padding:0}.tr-section[data-section-key="story"] .tr-section-head{border-bottom:1px solid #f0f2f5}
+#editor{min-height:360px}.ql-toolbar{border:0!important;border-bottom:1px solid #e8ebf0!important;padding:11px 12px!important}.ql-container{border:0!important}.ql-editor{min-height:390px!important;padding:18px!important;font-family:Georgia,'Times New Roman',serif!important;font-size:17px!important;line-height:1.72!important;color:#202124!important}.ql-editor.ql-blank::before{left:18px!important;color:#a0a6b2!important;font-style:normal!important}
+.build-panel,.migration-panel,.editor-intel,.gate-card{margin:0!important}.tr-section[data-section-key="build"] .tr-section-body,.tr-section[data-section-key="migration"] .tr-section-body{padding-top:0}
+#buildLog,#migrationLog{max-height:240px!important;border-radius:10px!important}
+.tr-live-bar{display:flex;align-items:center;gap:7px;padding:8px 10px;border-radius:9px;background:#f8fafc;border:1px solid #e9edf3;margin-bottom:10px;font-size:10px;color:#64748b}.tr-live-bar strong{color:#111827}.tr-live-bar .dot{width:7px;height:7px;border-radius:50%;background:#94a3b8}.tr-live-bar.busy .dot{background:#eab308}.tr-live-bar.ready .dot{background:#22c55e}.tr-live-bar.error .dot{background:#ef4444}
+.tr-link-scan{display:flex;align-items:center;gap:12px;padding:20px;border:1px dashed #dfe3eb;border-radius:12px;background:#fafbfc}.tr-link-scan>div:last-child{display:flex;flex-direction:column;gap:3px}.tr-link-scan strong{font-size:12px;color:#111827}.tr-link-scan span{font-size:10px;color:#6b7280}.tr-spinner{width:24px;height:24px;border:3px solid #f1d3cf;border-top-color:var(--tr-accent);border-radius:50%;animation:trSpin .8s linear infinite}.tr-link-summary{padding:10px 11px;background:#f8fafc;border-radius:10px;border:1px solid #e7ebf1;display:flex;flex-direction:column;gap:2px;margin-bottom:9px}.tr-link-summary strong{font-size:11px;color:#111827}.tr-link-summary span{font-size:9px;color:#6b7280}.tr-link-card{border:1px solid #e4e7ed;border-radius:12px;padding:12px;background:#fff}.tr-link-card+.tr-link-card{margin-top:8px}.tr-link-card-top{display:flex;align-items:flex-start;gap:8px}.tr-link-rank{font:900 9px ui-monospace,monospace;color:#9ca3af}.tr-link-destination{display:flex;flex-direction:column;gap:2px;flex:1;min-width:0}.tr-link-destination strong{font-size:11px;line-height:1.35;color:#111827}.tr-link-destination span{font-size:8px;color:#9ca3af;text-transform:uppercase;letter-spacing:.06em}.tr-link-confidence{font-size:10px;font-weight:900;color:#15803d}.tr-link-anchor{margin-top:10px;padding:8px 9px;background:#fff7f5;border-left:3px solid var(--tr-accent);display:flex;flex-direction:column;gap:2px}.tr-link-anchor span{font-size:8px;text-transform:uppercase;letter-spacing:.1em;color:#9ca3af;font-weight:800}.tr-link-anchor strong{font-size:12px;color:#111827}.tr-link-context{margin-top:8px;font-size:9px;line-height:1.5;color:#6b7280}.tr-link-reasons{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px}.tr-link-reasons span{padding:4px 6px;border-radius:999px;background:#f3f4f6;color:#6b7280;font-size:8px;font-weight:700}.apply-smart-link{width:100%;margin-top:9px;height:34px;border:1px solid var(--tr-accent);border-radius:8px;background:#fff;color:var(--tr-accent);font-size:10px;font-weight:900}.apply-smart-link:hover{background:var(--tr-accent);color:#fff}.tr-link-empty{padding:20px;text-align:center;border:1px dashed #d8dde6;border-radius:12px;display:flex;flex-direction:column;gap:5px}.tr-link-empty strong{font-size:12px;color:#111827}.tr-link-empty span{font-size:10px;color:#6b7280;line-height:1.5}.tr-link-empty.error{border-color:#fecaca;background:#fff7f7}
+
+.tr-story-body{padding:0!important}.tr-story-card{border:0!important;box-shadow:none!important;border-radius:0!important}.tr-editor-card{border:0!important;box-shadow:none!important;border-radius:0!important}.tr-smart-links-button{width:100%;margin-top:14px;padding:11px 12px;border:1px solid #e7c0ba;border-radius:10px;background:#fff8f6;color:#b94f43;display:flex;align-items:center;justify-content:space-between;text-align:left}.tr-smart-links-button strong{display:block;font-size:11px}.tr-smart-links-button small{display:block;margin-top:2px;color:#9a706b;font-size:9px}.tr-smart-links-button b{font-size:16px}
+@keyframes trSpin{to{transform:rotate(360deg)}}@keyframes trPulse{50%{opacity:.45;transform:scale(.85)}}
+@media(min-width:768px){.tr-workflow{width:min(1240px,calc(100% - 48px));flex-direction:row;align-items:center;justify-content:space-between;padding:10px 14px}.tr-workflow-actions{width:390px;flex:0 0 auto}.tr-stepper{width:min(1240px,calc(100% - 48px));max-width:680px;margin-left:max(24px,calc((100% - 1240px)/2));margin-right:auto}.tr-section-head{padding:17px 18px}.tr-section-body{padding:0 18px 18px}}
+@media(max-width:767px){main{padding-top:4px!important}.tr-workflow{top:72px}.tr-workflow-status{display:none}.tr-step b{display:none}.tr-step{min-height:36px}.tr-step span{width:20px;height:20px}.tr-section-body{overflow-x:hidden}.tr-section-head{position:relative}.fab-button{width:50px!important;height:50px!important;bottom:16px!important;right:16px!important}.fab-drawer{right:16px!important;bottom:76px!important;min-width:min(280px,calc(100vw - 32px))!important}}
+@media(prefers-reduced-motion:reduce){.tr-spinner,.tr-status-dot.busy{animation:none}}
+
     </style>
 </head>
 
@@ -260,7 +284,35 @@
     </div>
 </div>
 
+<section class="tr-workflow" id="editorWorkflow" aria-label="Publication workflow">
+    <div class="tr-workflow-main">
+        <div class="tr-workflow-identity">
+            <span class="tr-workflow-eyebrow">EDITORIAL DESK</span>
+            <strong id="workflowTitle">New story</strong>
+            <span id="workflowSubline">Start with the headline and article body.</span>
+        </div>
+        <div class="tr-workflow-status" aria-live="polite">
+            <span class="tr-status-dot" id="workflowStatusDot"></span>
+            <span id="workflowStatusText">Ready to edit</span>
+            <span class="tr-status-time" id="workflowStatusTime">Not published</span>
+        </div>
+    </div>
+    <div class="tr-workflow-actions">
+        <button type="button" class="tr-action secondary" id="workflowSaveBtn">Save draft</button>
+        <button type="button" class="tr-action secondary" id="workflowPreviewBtn">Preview build</button>
+        <button type="button" class="tr-action primary" id="workflowPublishBtn">Publish &amp; build <span>↗</span></button>
+    </div>
+</section>
+
 <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <nav class="tr-stepper" aria-label="Editorial workflow steps">
+        <button type="button" class="tr-step active" data-step-target="story"><span>1</span><b>Story</b></button>
+        <button type="button" class="tr-step" data-step-target="details"><span>2</span><b>Details</b></button>
+        <button type="button" class="tr-step" data-step-target="seo"><span>3</span><b>SEO</b></button>
+        <button type="button" class="tr-step" data-step-target="review"><span>4</span><b>Review</b></button>
+        <button type="button" class="tr-step" data-step-target="build"><span>5</span><b>Build</b></button>
+    </nav>
+
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         <div class="lg:col-span-2 space-y-6">
@@ -332,7 +384,7 @@
                 <div class="flex items-start justify-between gap-4 mb-4">
                     <div>
                         <h3 class="text-base font-extrabold text-[#00001a]">Static SEO Build Engine</h3>
-                        <p class="text-xs text-gray-500 mt-1">Publishing reads and updates only <code>assets/articles.json</code>. Published News article pages and editor deltas remain independent content assets.</p>
+                        <p class="text-xs text-gray-500 mt-1">Publishing validates the story, writes the article + delta + metadata, rebuilds discovery assets, then commits the complete publication atomically to GitHub. The public homepage remains publisher-owned and is never redesigned by the editor.</p>
                     </div>
                     <div class="flex flex-wrap justify-end gap-2">
                         <button id="migrateRoutesBtn" class="shrink-0 px-3 py-2 text-xs font-bold text-amber-700 border border-amber-300 bg-amber-50 rounded-lg hover:bg-amber-100 transition">
@@ -821,10 +873,10 @@ const STATIC_BUILD_CONFIG = {
     generateRobots: false,
     maxArticlesPerIndex: 100,
     siteName: 'TrendRader',
-    publisherName: 'TrendRader Editorial Unit',
+    publisherName: 'TrendRader Editorial',
     organizationName: 'TrendRader',
     publicationName: 'TrendRader',
-    defaultImage: 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=1200&auto=format&fit=crop',
+    defaultImage: '',
     articleDataPath: 'assets/articles.json',
     categoryDataPath: 'assets/categories.json',
     newsSitemapPath: 'sitemap.xml',
@@ -1408,9 +1460,15 @@ function showToast(message, duration = 4000) {
 function setBuildStatus(state, text) {
     const badge = document.getElementById('buildStatusBadge');
     const label = document.getElementById('buildStatusText');
-    badge.classList.remove('ready', 'busy', 'error');
-    if (state) badge.classList.add(state);
-    label.textContent = text;
+    if (badge) {
+        badge.classList.remove('ready', 'busy', 'error');
+        if (state) badge.classList.add(state);
+    }
+    if (label) label.textContent = text;
+    if (typeof setWorkflowStatus === 'function') {
+        const mapped = state === 'error' ? 'error' : state === 'busy' ? 'busy' : state === 'ready' ? 'ready' : 'idle';
+        setWorkflowStatus(mapped, text, state === 'busy' ? 'Working…' : new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'}));
+    }
 }
 
 function logBuild(message, type = 'info') {
@@ -3868,6 +3926,9 @@ function autoSaveDraft() {
                 const label = state.querySelector('span:last-child');
                 if (label) label.textContent = 'Autosaved';
             }
+            if (!buildInProgress && typeof setWorkflowStatus === 'function') {
+                setWorkflowStatus('ready', 'Autosaved', `Local draft · ${new Date().toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}`);
+            }
         } catch (e) {
             console.error('Autosave failed:', e);
         }
@@ -4322,6 +4383,7 @@ async function publishArticle() {
     const imageUrl = document.getElementById('imageUrlInput').value.trim();
 
     const preflight = runPublicationPreflight();
+    revealBuildPanel('Publication preflight');
     if (preflight.blocked) {
         showToast('Publication blocked. Fix the red preflight items first.', 7000);
         document.getElementById('seoAnalysis')?.scrollIntoView({ behavior:'smooth', block:'center' });
@@ -4351,7 +4413,9 @@ async function publishArticle() {
     const isUpdate = editingArticleIndex !== null;
 
     setBuildStatus('busy', isUpdate ? 'Preparing update' : 'Preparing publication');
+    setWorkflowStatus('busy', isUpdate ? 'Preparing article update' : 'Preparing publication', 'Preflight passed');
     resetBuildLog();
+    logBuild('Publication workflow started.', 'info');
 
     try {
         const rawArticleHTML = quill ? quill.root.innerHTML : '<p>No content.</p>';
@@ -4520,6 +4584,8 @@ async function publishArticle() {
         );
 
         logBuild(`Publication committed atomically: ${commit.sha.slice(0, 7)}.`, 'ok');
+        setBuildStatus('ready', isUpdate ? 'Published update' : 'Published successfully');
+        setWorkflowStatus('ready', isUpdate ? 'Article updated and live' : 'Article published and live', `Commit ${commit.sha.slice(0, 7)}`);
 
         showToast(isUpdate ? 'Article updated + complete static rebuild published.' : 'Article published + complete static rebuild published.');
 
@@ -4530,9 +4596,10 @@ async function publishArticle() {
         setTimeout(() => {
             clearForm();
             window.location.href = 'published.html';
-        }, 900);
+        }, 1800);
     } catch (error) {
-        setBuildStatus('error', 'Publication rejected');
+        setBuildStatus('error', 'Publication failed');
+        setWorkflowStatus('error', 'Publication failed', error.message || 'See build log');
         logBuild(error.message, 'error');
         showToast(`Publication rejected: ${error.message}`, 7000);
     }
@@ -4962,7 +5029,7 @@ function runPublicationPreflight(){
     else if(!taxonomySubcategory(selectedCategory, selectedSubcategory))fail('Sub-category','The selected sub-category does not belong to the selected category.');
     else pass('Taxonomy',`Publication taxonomy is ${getTaxonomyLabel(selectedCategory,selectedSubcategory)}.`);
     if(!document.getElementById('contentTypeSelect').value)warn('Story format','Select a story format such as News Report, Explainer, Analysis or Tutorial.');
-    if(!document.getElementById('imageUrlInput').value.trim())warn('Featured image','No custom featured image; the static builder will use its default image.');
+    if(!document.getElementById('imageUrlInput').value.trim())fail('Featured image','A real featured image is required for publication and search/social previews. Upload one through Cloudinary.');
     const score=Math.max(0,Math.min(100,Math.round(checks.reduce((t,i)=>t+(i.type==='pass'?1:i.type==='warn'?.45:0),0)/Math.max(1,checks.length)*100)));
     const result={score,blocked:checks.some(i=>i.type==='fail'),warnings:checks.some(i=>i.type==='warn'),checks,metrics:m};
     renderPreflight(result);updateLiveEditorMetrics();return result;
@@ -4980,159 +5047,159 @@ function analyzeSEO(){
 async function analyzeAndSuggestInternalLinks() {
     const modal = document.getElementById('internalLinkModal');
     const suggestionsContainer = document.getElementById('internalLinkSuggestions');
+    if (!modal || !suggestionsContainer) return;
 
     modal.classList.remove('hidden');
     modal.classList.add('flex');
-
     suggestionsContainer.innerHTML = `
-        <div class="text-center text-gray-500 py-8">
-            <div class="animate-spin inline-block w-8 h-8 border-2 border-[#f15e50] border-t-transparent rounded-full mb-3"></div>
-            <p class="text-sm font-medium">Scanning published articles...</p>
+        <div class="tr-link-scan">
+            <div class="tr-spinner"></div>
+            <div><strong>Mapping the story</strong><span>Comparing entities, phrases, taxonomy and published coverage.</span></div>
         </div>`;
-
-    const text = quill ? quill.getText().toLowerCase() : '';
-    const title = document.getElementById('titleInput').value.toLowerCase();
-
-    const words = (text + ' ' + title).match(/\b[a-z]{4,}\b/g) || [];
-
-    const stopWords = new Set([
-        'this','that','with','from','have','will','your','about','into','over','under',
-        'more','most','other','some','such','than','then','them','they','their','there',
-        'these','those','which','while','where','when','what','were','been','could',
-        'would','should','because','between','through','during','before','after','each',
-        'very','just','also','only','same','not','and','but','for','the','you','are',
-        'was','is','it','of','in','on','at','to','by','an','or','as','if','we','us',
-        'our','out','off','again','here','how','all','any','both','few','its','own',
-        'too','can','cannot','without','within','across','against','around','towards',
-        'upon','whether','since','until','however','therefore','though','although',
-        'even','ever','never','always','often','really','still','yet','perhaps',
-        'indeed','almost','quite','rather','simply','article','news','trendrader','technology',
-        'system','process','using','based','make','made','like','good','best','work',
-        'works','time','new','one','two','way','ways','use','used','data','code'
-    ]);
-
-    const freq = {};
-
-    words.forEach(w => {
-        if (!stopWords.has(w)) freq[w] = (freq[w] || 0) + 1;
-    });
-
-    const topKeywords = Object.entries(freq)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 6)
-        .map(e => e[0]);
-
-    if (!topKeywords.length) {
-        suggestionsContainer.innerHTML =
-            '<p class="text-sm text-red-500 text-center py-4">Not enough unique words to analyze.</p>';
-        return;
-    }
 
     try {
         const config = getGitHubConfig();
         const { articles } = await fetchArticlesJson(config);
-        const currentSlug = editingOriginalSlug || generateSlug(document.getElementById('titleInput').value);
-        const suggestions = [];
+        const currentTitle = document.getElementById('titleInput')?.value.trim() || '';
+        const currentCategory = document.getElementById('categorySelect')?.value || '';
+        const currentSubcategory = document.getElementById('subcategorySelect')?.value || '';
+        const currentSlug = editingOriginalSlug || generateSlug(currentTitle);
+        const bodyText = quill ? quill.getText().replace(/\s+/g, ' ').trim() : '';
+        const fullText = `${currentTitle} ${bodyText}`.trim();
+        const lowerBody = bodyText.toLowerCase();
 
-        for (const article of articles) {
-            if (!article || !article.url) continue;
-            if (currentSlug && article.url.includes(currentSlug)) continue;
+        const stop = new Set([
+            'about','after','again','against','among','because','before','being','between','could','during','every','first','from','have','into','more','most','other','over','same','should','some','such','than','that','their','there','these','they','this','those','through','under','until','very','were','what','when','where','which','while','would','with','your','also','been','being','both','each','even','just','many','much','only','other','really','still','than','then','them','will','news','article','story','today','trendrader','report','reports','reported'
+        ]);
+        const normalizeWords = value => (String(value || '').toLowerCase().match(/[a-z0-9][a-z0-9'-]{2,}/g) || []).filter(w => !stop.has(w));
+        const bodyTokens = new Set(normalizeWords(fullText));
+        const currentKeywords = String(document.getElementById('keywordsInput')?.value || '').split(',').map(v => v.trim().toLowerCase()).filter(Boolean);
 
-            let score = 0;
-            let matchedKeyword = '';
+        const existingLinks = quill ? Array.from(quill.root.querySelectorAll('a[href]')).map(a => ({ text: a.textContent.trim().toLowerCase(), href: a.getAttribute('href') || '' })) : [];
+        const linkedRanges = new Set(existingLinks.map(x => x.text));
 
-            const articleTitleLower = (article.title || '').toLowerCase();
-            const articleDescLower = (article.desc || '').toLowerCase();
+        const candidates = [];
+        for (const article of articles || []) {
+            if (!article || !article.title || !article.url) continue;
+            const slug = String(article.slug || article.url.split('/').pop() || '').replace(/\.html$/i, '');
+            if (currentSlug && slug === currentSlug) continue;
+            const title = String(article.title).trim();
+            const desc = String(article.desc || '').trim();
+            const articleWords = normalizeWords(`${title} ${desc} ${Array.isArray(article.keywords) ? article.keywords.join(' ') : article.keywords || ''}`);
+            const articleSet = new Set(articleWords);
+            const overlap = [...bodyTokens].filter(w => articleSet.has(w));
+            const titleTokens = normalizeWords(title);
+            const titleOverlap = titleTokens.filter(w => bodyTokens.has(w));
+            const sameCategory = String(article.category || article.meta || '').toLowerCase() === String(currentCategory).toLowerCase() && currentCategory;
+            const sameSubcategory = String(article.subcategory || '').toLowerCase() === String(currentSubcategory).toLowerCase() && currentSubcategory;
+            const exactPhrases = [];
 
-            for (const kw of topKeywords) {
-                if (articleTitleLower.includes(kw)) {
-                    score += 5;
-                    if (!matchedKeyword) matchedKeyword = kw;
-                } else if (articleDescLower.includes(kw)) {
-                    score += 2;
-                    if (!matchedKeyword) matchedKeyword = kw;
+            // Prefer meaningful 2-5 word phrases from the destination title that already exist in the story.
+            for (let n = Math.min(5, titleTokens.length); n >= 2; n--) {
+                for (let i = 0; i <= titleTokens.length - n; i++) {
+                    const phrase = titleTokens.slice(i, i + n).join(' ');
+                    if (phrase.length < 8 || phrase.length > 72) continue;
+                    if (lowerBody.includes(phrase) && !linkedRanges.has(phrase)) exactPhrases.push(phrase);
                 }
+                if (exactPhrases.length >= 3) break;
             }
 
-            if (score >= 2) {
-                suggestions.push({
-                    title: article.title,
-                    url: `../${article.url}`,
+            // Also use explicit article keywords as entity candidates, but only when they occur naturally in the copy.
+            const keywordCandidates = (Array.isArray(article.keywords) ? article.keywords : String(article.keywords || '').split(',')).map(v => String(v).trim().toLowerCase()).filter(v => v.length >= 5 && v.length <= 60);
+            for (const phrase of keywordCandidates) {
+                if (lowerBody.includes(phrase) && !linkedRanges.has(phrase)) exactPhrases.push(phrase);
+            }
+
+            const uniquePhrases = Array.from(new Set(exactPhrases)).sort((a,b) => b.length - a.length);
+            const phraseBonus = uniquePhrases.length ? Math.min(24, uniquePhrases[0].split(/\s+/).length * 5 + 6) : 0;
+            const overlapScore = Math.min(20, overlap.length * 2);
+            const titleScore = Math.min(22, titleOverlap.length * 5);
+            const taxonomyScore = (sameSubcategory ? 12 : 0) + (sameCategory ? 6 : 0);
+            const keywordScore = currentKeywords.filter(k => articleSet.has(k) || String(article.title).toLowerCase().includes(k)).length * 4;
+            const recencyDays = Math.max(0, (Date.now() - new Date(article.date || article.modified || 0).getTime()) / 86400000);
+            const recencyScore = Number.isFinite(recencyDays) ? Math.max(0, Math.round(8 - Math.min(8, recencyDays / 7))) : 0;
+            const score = phraseBonus + overlapScore + titleScore + taxonomyScore + Math.min(12, keywordScore) + recencyScore;
+
+            if (score >= 16 && uniquePhrases.length) {
+                const anchor = uniquePhrases[0];
+                const occurrence = lowerBody.indexOf(anchor);
+                const contextStart = Math.max(0, lowerBody.lastIndexOf(' ', Math.max(0, occurrence - 90)));
+                const contextEnd = Math.min(bodyText.length, bodyText.indexOf(' ', Math.min(bodyText.length - 1, occurrence + anchor.length + 100)));
+                const context = bodyText.slice(contextStart, contextEnd === -1 ? Math.min(bodyText.length, occurrence + anchor.length + 100) : contextEnd).trim();
+                candidates.push({
+                    article,
                     score,
-                    keyword: matchedKeyword
+                    anchor,
+                    context,
+                    reasons: [
+                        sameSubcategory ? 'same sub-category' : sameCategory ? 'same section' : '',
+                        titleOverlap.length ? `${titleOverlap.length} title topic match${titleOverlap.length === 1 ? '' : 'es'}` : '',
+                        overlap.length ? `${overlap.length} semantic overlap${overlap.length === 1 ? '' : 's'}` : '',
+                        'exact phrase exists in this story'
+                    ].filter(Boolean)
                 });
             }
         }
 
-        suggestions.sort((a, b) => b.score - a.score);
+        candidates.sort((a,b) => b.score - a.score || new Date(b.article.date || 0) - new Date(a.article.date || 0));
+        const top = candidates.slice(0, 6);
 
-        const topSuggestions = suggestions.slice(0, 4);
-
-        if (!topSuggestions.length) {
-            suggestionsContainer.innerHTML =
-                '<div class="text-center py-6"><p class="text-sm text-gray-500">No strong keyword matches found.</p></div>';
+        if (!top.length) {
+            suggestionsContainer.innerHTML = `<div class="tr-link-empty"><strong>No high-confidence link opportunities.</strong><span>TrendRader will not inject arbitrary keywords. Add a natural reference to another published story, then run the analysis again.</span></div>`;
             return;
         }
 
-        suggestionsContainer.innerHTML = topSuggestions.map(s => `
-            <div class="border border-gray-200 rounded-lg p-3 hover:border-[#f15e50] hover:bg-[#fef3f2] transition bg-white">
-                <div class="flex justify-between items-start gap-3">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-semibold text-gray-900">${escapeHtml(s.title)}</p>
-                        <p class="text-xs text-gray-500 mt-1.5">Matches: <span class="font-mono text-[#f15e50] font-semibold">"${escapeHtml(s.keyword)}"</span></p>
+        suggestionsContainer.innerHTML = `
+            <div class="tr-link-summary"><strong>${top.length} contextual opportunities</strong><span>Only phrases already present in your copy are eligible. Nothing is inserted automatically.</span></div>
+            ${top.map((s, index) => {
+                const href = `../${String(s.article.url).replace(/^\.\//, '')}`;
+                const confidence = Math.min(99, Math.round(55 + s.score * 1.7));
+                return `<article class="tr-link-card">
+                    <div class="tr-link-card-top">
+                        <span class="tr-link-rank">${String(index + 1).padStart(2, '0')}</span>
+                        <div class="tr-link-destination"><strong>${escapeHtml(s.article.title)}</strong><span>${escapeHtml(s.article.category || 'News')} ${s.article.subcategory ? `· ${escapeHtml(s.article.subcategory)}` : ''}</span></div>
+                        <span class="tr-link-confidence">${confidence}%</span>
                     </div>
-                    <button data-keyword="${escapeAttr(s.keyword)}" data-url="${escapeAttr(s.url)}" class="inject-link px-3 py-1.5 text-xs font-bold text-white bg-[#f15e50] rounded-md hover:bg-[#d94a3e] transition whitespace-nowrap">
-                        Inject
-                    </button>
-                </div>
-            </div>
-        `).join('');
+                    <div class="tr-link-anchor"><span>Suggested anchor</span><strong>“${escapeHtml(s.anchor)}”</strong></div>
+                    <p class="tr-link-context">…${escapeHtml(s.context)}…</p>
+                    <div class="tr-link-reasons">${s.reasons.map(r => `<span>${escapeHtml(r)}</span>`).join('')}</div>
+                    <button class="apply-smart-link" data-anchor="${escapeAttr(s.anchor)}" data-url="${escapeAttr(href)}" type="button">Link this phrase <span>↗</span></button>
+                </article>`;
+            }).join('')}`;
 
-        suggestionsContainer.querySelectorAll('.inject-link').forEach(button => {
+        suggestionsContainer.querySelectorAll('.apply-smart-link').forEach(button => {
             button.addEventListener('click', () => {
-                injectInternalLink(button.dataset.keyword, button.dataset.url);
+                const applied = applySmartInternalLink(button.dataset.anchor, button.dataset.url);
+                if (applied) button.textContent = 'Linked ✓';
             });
         });
     } catch (error) {
         console.error('Internal link analysis error:', error);
-        suggestionsContainer.innerHTML =
-            '<div class="text-center py-6"><p class="text-sm text-red-500 font-medium">Failed to fetch published articles.</p></div>';
+        suggestionsContainer.innerHTML = `<div class="tr-link-empty error"><strong>Internal-link analysis failed.</strong><span>${escapeHtml(error.message || 'Unable to read published stories.')}</span></div>`;
     }
 }
 
-function injectInternalLink(keyword, url) {
-    if (!quill) return;
-
+function applySmartInternalLink(anchor, url) {
+    if (!quill || !anchor || !url) return false;
     const text = quill.getText();
-    const lowerText = text.toLowerCase();
-    const lowerKeyword = keyword.toLowerCase();
-
-    let searchIndex = 0;
-    let insertIndex = -1;
-
-    while (true) {
-        const idx = lowerText.indexOf(lowerKeyword, searchIndex);
-
-        if (idx === -1) break;
-
-        const formats = quill.getFormat(idx, lowerKeyword.length);
-
-        if (!formats.link) {
-            insertIndex = idx;
-            break;
+    const lower = text.toLowerCase();
+    const target = anchor.toLowerCase();
+    let index = lower.indexOf(target);
+    while (index !== -1) {
+        const format = quill.getFormat(index, anchor.length);
+        if (!format.link) {
+            quill.formatText(index, anchor.length, 'link', url, 'user');
+            quill.setSelection(index + anchor.length, 0, 'user');
+            autoSaveDraft();
+            updateLiveEditorMetrics();
+            if (lastPreflight) runPublicationPreflight();
+            showToast(`Linked “${anchor}” to the related TrendRader story.`);
+            return true;
         }
-
-        searchIndex = idx + lowerKeyword.length;
+        index = lower.indexOf(target, index + anchor.length);
     }
-
-    if (insertIndex !== -1) {
-        quill.formatText(insertIndex, lowerKeyword.length, 'link', url);
-        quill.setSelection(insertIndex + lowerKeyword.length);
-        showToast(`Successfully linked "${keyword}".`);
-        closeInternalLinkModal();
-    } else {
-        showToast('Keyword not found or already linked.');
-    }
+    showToast(`The phrase “${anchor}” is already linked or no longer exists.`);
+    return false;
 }
 
 function closeInternalLinkModal() {
@@ -5395,11 +5462,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('fabBuild').addEventListener('click', () => {
         closeFabDrawer();
+        if (typeof revealBuildPanel === 'function') revealBuildPanel('Static build');
         rebuildStaticIndex();
     });
 
     document.getElementById('fabInternalLink').addEventListener('click', () => {
         closeFabDrawer();
+        document.querySelector('.tr-section[data-section-key=\"seo\"] .tr-section-head')?.click();
         analyzeAndSuggestInternalLinks();
     });
 
@@ -5410,6 +5479,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('fabPublish').addEventListener('click', () => {
         closeFabDrawer();
+        if (typeof revealBuildPanel === 'function') revealBuildPanel('Publication workflow');
         publishArticle();
     });
 
@@ -5429,6 +5499,203 @@ document.addEventListener('DOMContentLoaded', () => {
             checkGitHubConnection();
             checkGroqConnection();
         }
+    });
+});
+
+
+
+
+/* ============================================================
+   WORKSPACE UX / PROGRESSIVE DISCLOSURE
+   ============================================================ */
+function setWorkflowStatus(state, message, detail = '') {
+    const dot = document.getElementById('workflowStatusDot');
+    const text = document.getElementById('workflowStatusText');
+    const time = document.getElementById('workflowStatusTime');
+    if (dot) dot.className = `tr-status-dot ${state || ''}`.trim();
+    if (text) text.textContent = message || 'Ready to edit';
+    if (time) time.textContent = detail || new Date().toLocaleTimeString([], { hour:'2-digit', minute:'2-digit' });
+}
+
+function revealBuildPanel(reason = 'Build') {
+    const panel = document.querySelector('.tr-section[data-section-key="build"]');
+    if (!panel) return;
+    panel.classList.add('tr-open');
+    const body = panel.querySelector('.tr-section-body');
+    if (body) body.hidden = false;
+    panel.scrollIntoView({ behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: 'start' });
+    setWorkflowStatus('busy', reason, 'Build workspace open');
+}
+
+function markWorkflowSteps(activeKey) {
+    const order = ['story','details','seo','review','build'];
+    const activeIndex = order.indexOf(activeKey);
+    document.querySelectorAll('.tr-step').forEach(step => {
+        const key = step.dataset.stepTarget;
+        const index = order.indexOf(key);
+        step.classList.toggle('active', key === activeKey);
+        step.classList.toggle('done', index >= 0 && activeIndex > index);
+    });
+}
+
+function setupProgressiveDisclosure() {
+    const left = document.querySelector('.lg\\:col-span-2');
+    const right = left?.nextElementSibling;
+    if (!left || !right) return;
+
+    const direct = (parent, predicate) => Array.from(parent.children).find(predicate) || null;
+    const titleCard = direct(left, el => el.querySelector?.('#titleInput'));
+    const editorCard = direct(left, el => el.querySelector?.('#editor'));
+    const intelCard = direct(left, el => el.classList.contains('editor-intel'));
+    const aiCard = direct(left, el => el.querySelector?.('#generateAutoSeoBtn'));
+    const buildCard = direct(left, el => el.classList.contains('build-panel'));
+    const migrationCard = direct(left, el => el.classList.contains('migration-panel'));
+    const detailsCard = direct(right, el => el.querySelector?.('#categorySelect'));
+    const descriptionCard = direct(right, el => el.querySelector?.('#descriptionInput'));
+    const reviewCard = direct(right, el => el.classList.contains('gate-card'));
+
+    // The headline and Quill editor are intentionally one workflow section.
+    let storySection = null;
+    if (titleCard && editorCard) {
+        storySection = document.createElement('section');
+        storySection.className = 'tr-section tr-open';
+        storySection.dataset.sectionKey = 'story';
+        const head = document.createElement('button');
+        head.type = 'button';
+        head.className = 'tr-section-head';
+        head.setAttribute('aria-expanded', 'true');
+        head.innerHTML = '<span class="tr-section-title"><span class="tr-section-num">01</span><span class="tr-section-label"><strong>Story</strong><span>Headline and article body</span></span></span><span class="tr-section-chevron">⌃</span>';
+        const body = document.createElement('div');
+        body.className = 'tr-section-body tr-story-body';
+        titleCard.classList.add('tr-story-card');
+        editorCard.classList.add('tr-editor-card');
+        body.append(titleCard, editorCard);
+        storySection.append(head, body);
+        left.insertBefore(storySection, left.firstChild);
+        head.addEventListener('click', () => toggleEditorSection(storySection, head, body));
+    }
+
+    const wrap = (el, key, title, subtitle, number, open = false) => {
+        if (!el || el.dataset.trWrapped === '1') return null;
+        el.dataset.trWrapped = '1';
+        const section = document.createElement('section');
+        section.className = `tr-section ${open ? 'tr-open' : ''}`;
+        section.dataset.sectionKey = key;
+        const head = document.createElement('button');
+        head.type = 'button';
+        head.className = 'tr-section-head';
+        head.setAttribute('aria-expanded', String(open));
+        head.innerHTML = `<span class="tr-section-title"><span class="tr-section-num">${number}</span><span class="tr-section-label"><strong>${escapeHtml(title)}</strong><span>${escapeHtml(subtitle)}</span></span></span><span class="tr-section-chevron">${open ? '⌃' : '⌄'}</span>`;
+        const body = document.createElement('div');
+        body.className = 'tr-section-body';
+        el.parentNode.insertBefore(section, el);
+        body.appendChild(el);
+        section.append(head, body);
+        body.hidden = !open;
+        head.addEventListener('click', () => toggleEditorSection(section, head, body));
+        return section;
+    };
+
+    const toggleEditorSection = (section, head, body, force) => {
+        const open = typeof force === 'boolean' ? force : !section.classList.contains('tr-open');
+        section.classList.toggle('tr-open', open);
+        head.setAttribute('aria-expanded', String(open));
+        body.hidden = !open;
+        const chevron = head.querySelector('.tr-section-chevron');
+        if (chevron) chevron.textContent = open ? '⌃' : '⌄';
+    };
+    window.toggleEditorSection = toggleEditorSection;
+
+    wrap(detailsCard, 'details', 'Story details', 'Taxonomy, format, author and featured image', '02', true);
+    wrap(intelCard, 'seo', 'Search & publication metadata', 'SEO title, entity, keywords and source', '03', false);
+    wrap(descriptionCard, 'description', 'Search description', 'Meta description and search snippet', '04', false);
+    wrap(aiCard, 'ai', 'Editorial AI assistance', 'Metadata generation and image concepts', '05', false);
+    wrap(reviewCard, 'review', 'Publication review', 'Deterministic editorial and SEO gate', '06', false);
+    wrap(buildCard, 'build', 'Build & publication', 'Validation, files, commit and live result', '07', false);
+    wrap(migrationCard, 'migration', 'Data recovery', 'Legacy News database recovery tools', '08', false);
+
+    // Put the core story first, then details; advanced tooling follows.
+    Array.from(left.children).forEach((el, i) => { if (el.classList.contains('tr-section')) el.style.order = String(i); });
+    if (storySection) storySection.style.order = '-2';
+    const detailsSection = document.querySelector('.tr-section[data-section-key="details"]');
+    if (detailsSection) detailsSection.style.order = '-1';
+
+    const build = document.querySelector('.tr-section[data-section-key="build"] .tr-section-body');
+    if (build && !document.getElementById('buildLiveState')) {
+        const live = document.createElement('div');
+        live.id = 'buildLiveState';
+        live.className = 'tr-live-bar';
+        live.innerHTML = '<span class="dot"></span><strong>Build idle</strong><span>Publish or preview to see live progress here.</span>';
+        build.prepend(live);
+    }
+
+    // Smart internal linking is a contextual editorial tool, not a hidden FAB action.
+    const seoBody = document.querySelector('.tr-section[data-section-key="seo"] .tr-section-body');
+    if (seoBody && !document.getElementById('smartLinksOpenBtn')) {
+        const action = document.createElement('button');
+        action.type = 'button'; action.id = 'smartLinksOpenBtn'; action.className = 'tr-smart-links-button';
+        action.innerHTML = '<span><strong>Smart internal links</strong><small>Find contextual links to published TrendRader stories</small></span><b>↗</b>';
+        action.addEventListener('click', analyzeAndSuggestInternalLinks);
+        seoBody.appendChild(action);
+    }
+
+    document.querySelectorAll('.tr-step').forEach(step => step.addEventListener('click', () => {
+        const key = step.dataset.stepTarget;
+        const panel = document.querySelector(`.tr-section[data-section-key="${key}"]`);
+        if (!panel) return;
+        const head = panel.querySelector('.tr-section-head'), body = panel.querySelector('.tr-section-body');
+        toggleEditorSection(panel, head, body, true);
+        markWorkflowSteps(key);
+        panel.scrollIntoView({behavior:window.matchMedia('(prefers-reduced-motion: reduce)').matches?'auto':'smooth',block:'start'});
+    }));
+
+    updateWorkflowIdentity();
+}
+
+function updateWorkflowIdentity() {
+    const title = document.getElementById('titleInput')?.value.trim();
+    const el = document.getElementById('workflowTitle');
+    const sub = document.getElementById('workflowSubline');
+    if (el) el.textContent = title || 'New story';
+    if (sub) sub.textContent = title ? 'Editing article content and publication data.' : 'Start with the headline and article body.';
+}
+
+function enhanceLiveStatus() {
+    const original = setBuildStatus;
+    // The function body is already upgraded; this observer only keeps the build card synchronized.
+    const target = document.getElementById('buildStatusText');
+    if (!target) return;
+    const observer = new MutationObserver(() => {
+        const live = document.getElementById('buildLiveState');
+        if (!live) return;
+        const text = target.textContent || 'Build idle';
+        live.querySelector('strong').textContent = text;
+        const lower = text.toLowerCase();
+        live.classList.toggle('busy', /prepar|validat|generat|upload|commit|build|publish/.test(lower) && !/published successfully|live|ready/.test(lower));
+        live.classList.toggle('ready', /ready|published|live|complete|success/.test(lower));
+        live.classList.toggle('error', /fail|error|reject|blocked/.test(lower));
+    });
+    observer.observe(target, { childList:true, characterData:true, subtree:true });
+}
+
+function wireWorkflowActions() {
+    document.getElementById('workflowSaveBtn')?.addEventListener('click', () => { saveDraft(); setWorkflowStatus('ready','Draft saved','Local draft updated'); updateWorkflowIdentity(); });
+    document.getElementById('workflowPreviewBtn')?.addEventListener('click', () => { revealBuildPanel('Build preview'); previewBuild(); });
+    document.getElementById('workflowPublishBtn')?.addEventListener('click', () => { revealBuildPanel('Publication workflow'); publishArticle(); });
+    document.getElementById('titleInput')?.addEventListener('input', updateWorkflowIdentity);
+    window.addEventListener('beforeunload', () => {
+        try { localStorage.setItem('trendrader-editor-last-state', JSON.stringify({status:document.getElementById('workflowStatusText')?.textContent || '', time:Date.now()})); } catch(e) {}
+    });
+}
+
+// This listener runs after the original editor initialization so Quill keeps its original DOM node.
+document.addEventListener('DOMContentLoaded', () => {
+    requestAnimationFrame(() => {
+        setupProgressiveDisclosure();
+        wireWorkflowActions();
+        enhanceLiveStatus();
+        markWorkflowSteps('story');
+        setWorkflowStatus('ready', 'Ready to edit', 'Autosave enabled');
     });
 });
 
