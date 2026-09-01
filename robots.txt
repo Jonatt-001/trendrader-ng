@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /assets/private/
+Sitemap: https://trendrader.space/sitemap.xml

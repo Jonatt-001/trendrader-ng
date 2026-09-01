@@ -1,0 +1,529 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="{{DESCRIPTION_ATTR}}">
+<meta name="theme-color" content="#f4f2ed">
+<meta name="robots" content="{{ROBOTS_DIRECTIVE}}">
+<meta name="author" content="{{PUBLISHER_NAME}}">
+<meta name="date" content="{{DATE_PUBLISHED}}">
+<meta name="last-modified" content="{{DATE_MODIFIED}}">
+<meta name="keywords" content="{{CATEGORY_LABEL_ATTR}}">
+<link rel="canonical" href="{{CANONICAL_URL}}">
+<link rel="alternate" type="application/rss+xml" title="TrendRader RSS" href="{{RSS_URL}}">
+<meta property="og:site_name" content="TrendRader">
+<meta property="og:url" content="{{CANONICAL_URL}}">
+<meta property="og:locale" content="en_NG">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="{{IMAGE_ALT}}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="{{SEO_TITLE}}">
+<meta name="twitter:description" content="{{DESCRIPTION_ATTR}}">
+<meta name="twitter:image" content="{{IMAGE_URL}}">
+<meta name="twitter:image:alt" content="{{IMAGE_ALT}}">
+<link rel="icon" href="./assets/favicon.svg" type="image/svg+xml">
+<script type="application/ld+json">{{ARTICLE_SCHEMA}}</script>
+<script type="application/ld+json">{{RELATED_SCHEMA}}</script>
+<meta property="og:type" content="article">
+<meta property="og:title" content="{{SEO_TITLE}}">
+<meta property="og:description" content="{{DESCRIPTION_ATTR}}">
+<meta property="og:image" content="{{IMAGE_URL}}">
+<title>{{SEO_TITLE}} — TrendRader</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
+
+<link rel="stylesheet" href="./article.css">
+</head>
+
+<body>
+
+<div class="progress" aria-hidden="true">
+  <span id="progressBar"></span>
+</div>
+
+<div class="cursor-glow" aria-hidden="true"></div>
+
+<header class="site-header" id="siteHeader">
+  <div class="header-inner">
+
+    <a class="brand" href="./index.html" aria-label="TrendRader home">
+      <span class="brand-mark">T</span>
+      <span class="brand-name">TRENDRADER</span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Primary navigation">
+      <a href="./index.html">Home</a>
+      <a href="./index.html#latest">Latest</a>
+      <a href="./index.html#politics">Politics</a>
+      <a href="./index.html#technology">Technology</a>
+      <a href="./index.html#business">Business</a>
+      <a href="./index.html#entertainment">Entertainment</a>
+      <a href="./index.html#trending">Trending</a>
+    </nav>
+
+    <div class="header-actions">
+      <button class="header-link" id="shareTop" type="button">
+        Share <span>↗</span>
+      </button>
+
+      <button
+        class="menu-button"
+        id="menuToggle"
+        type="button"
+        aria-label="Open menu"
+        aria-expanded="false"
+        aria-controls="mobileNav"
+      >
+        <span></span>
+        <span></span>
+      </button>
+    </div>
+
+  </div>
+
+  <nav class="mobile-nav" id="mobileNav" aria-label="Mobile navigation">
+    <a href="./index.html">Home</a>
+    <a href="./index.html#latest">Latest</a>
+    <a href="./index.html#technology">Technology</a>
+    <a href="./index.html#business">Business</a>
+    <a href="./index.html#culture">Culture</a>
+  </nav>
+</header>
+
+<main>
+
+  <article id="article">
+
+    <header class="article-header section-wrap">
+
+      <div class="article-kicker reveal">
+        <span class="kicker-label">{{TAG}}</span>
+        <i></i>
+        <span>{{CATEGORY_LABEL}}</span>
+      </div>
+
+      <h1 class="article-title reveal">
+        {{HEADLINE}}
+      </h1>
+
+      <p class="article-dek reveal">
+        {{DESCRIPTION_TEXT}}
+      </p>
+
+      <div class="article-meta reveal">
+
+        <div class="author">
+          <div class="author-avatar">MC</div>
+
+          <div class="author-details">
+            <strong>{{AUTHOR_NAME}}</strong>
+            <span>Editorial Desk</span>
+          </div>
+        </div>
+
+        <div class="meta-divider"></div>
+
+        <div class="meta-item">
+          <span>Published</span>
+          <strong>{{FORMATTED_DATE}}</strong>
+        </div>
+
+        <div class="meta-item">
+          <span>Reading time</span>
+          <strong>{{READ_TIME}} min</strong>
+        </div>
+
+      </div>
+
+    </header>
+
+    <figure class="hero-media section-wrap reveal">
+
+      <div class="hero-image-wrap">
+
+        <img
+          id="heroImage"
+          src="{{IMAGE_URL}}"
+          alt="{{IMAGE_ALT}}"
+          fetchpriority="high"
+        >
+
+        <div class="hero-overlay" aria-hidden="true"></div>
+
+        <div class="hero-image-index">
+          <span>01</span>
+          <i></i>
+          <span>{{TAG_ESCAPED}}</span>
+        </div>
+
+        <button
+          class="expand-image"
+          id="expandImage"
+          type="button"
+          aria-label="Expand hero image"
+        >
+          ⤢
+        </button>
+
+      </div>
+
+      <figcaption>
+        <span>The tools of publishing are changing. The standards should not.</span>
+        <span>Photo: TrendRader / Archive</span>
+      </figcaption>
+
+    </figure>
+
+    <div class="article-layout section-wrap">
+
+      <aside class="article-rail">
+
+        <div class="rail-sticky">
+
+          <div class="rail-heading">
+            <span>IN THIS STORY</span>
+            <i></i>
+          </div>
+
+          <a href="#trust">
+            <span>01</span>
+            A new trust layer
+          </a>
+
+          <a href="#speed">
+            <span>02</span>
+            Speed becomes editorial
+          </a>
+
+          <a href="#future">
+            <span>03</span>
+            The next media model
+          </a>
+
+          <button id="shareRail" type="button">
+            <span>Share article</span>
+            <b>↗</b>
+          </button>
+
+        </div>
+
+      </aside>
+
+      <div class="article-body" id="articleBody">
+        {{ARTICLE_BODY}}
+
+<div class="article-tags">
+          <span>Tags</span>
+          <a href="#">Media</a>
+          <a href="#">Technology</a>
+          <a href="#">Design</a>
+          <a href="#">Future</a>
+        </div>
+
+      </div>
+
+    </div>
+
+    <section class="author-card section-wrap reveal">
+
+      <div class="author-card-top">
+
+        <div class="author-avatar large">MC</div>
+
+        <div class="author-copy">
+
+          <span class="author-label">WRITTEN BY</span>
+
+          <h2>Maya Cole</h2>
+
+          <p>
+            Maya covers technology, media and the systems changing how people
+            work and communicate. She writes from the intersection of product,
+            culture and public information.
+          </p>
+
+          <a href="#">More from Maya <span>↗</span></a>
+
+        </div>
+
+      </div>
+
+    </section>
+
+    <section class="related section-wrap">
+
+      <div class="section-heading reveal">
+
+        <div>
+          <span class="eyebrow">KEEP READING</span>
+          <h2>More from TrendRader</h2>
+        </div>
+
+        <a href="./index.html#latest">
+          View all <span>↗</span>
+        </a>
+
+      </div>
+
+      <div class="related-grid">
+
+        <a
+          class="related-card reveal tilt-card"
+          href="./index.html#technology"
+        >
+
+          <div class="related-image">
+
+            <img
+              src="https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=1000&q=85"
+              alt="Computer circuitry"
+              loading="lazy"
+            >
+
+            <span>01</span>
+
+          </div>
+
+          <div class="related-meta">
+            <span>Technology</span>
+            <i></i>
+            <span>6 min</span>
+          </div>
+
+          <h3>
+            AI is moving from feature to infrastructure.
+          </h3>
+
+          <div class="related-arrow">↗</div>
+
+        </a>
+
+        <a
+          class="related-card reveal tilt-card"
+          href="./index.html#business"
+        >
+
+          <div class="related-image">
+
+            <img
+              src="https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?auto=format&fit=crop&w=1000&q=85"
+              alt="Financial market chart"
+              loading="lazy"
+            >
+
+            <span>02</span>
+
+          </div>
+
+          <div class="related-meta">
+            <span>Business</span>
+            <i></i>
+            <span>7 min</span>
+          </div>
+
+          <h3>
+            The companies quietly winning the efficiency race.
+          </h3>
+
+          <div class="related-arrow">↗</div>
+
+        </a>
+
+        <a
+          class="related-card reveal tilt-card"
+          href="./index.html#culture"
+        >
+
+          <div class="related-image">
+
+            <img
+              src="https://images.unsplash.com/photo-1519608487953-e999c86e7455?auto=format&fit=crop&w=1000&q=85"
+              alt="Mountain landscape"
+              loading="lazy"
+            >
+
+            <span>03</span>
+
+          </div>
+
+          <div class="related-meta">
+            <span>World</span>
+            <i></i>
+            <span>9 min</span>
+          </div>
+
+          <h3>
+            What resilient cities are getting right.
+          </h3>
+
+          <div class="related-arrow">↗</div>
+
+        </a>
+
+      </div>
+
+    </section>
+
+  </article>
+
+</main>
+
+<section class="newsletter section-wrap reveal">
+
+  <div class="newsletter-copy">
+
+    <div class="newsletter-eyebrow">
+      <span></span>
+      THE TRENDRADER BRIEF
+    </div>
+
+    <h2>
+      Know what matters.
+      <em>Before it matters.</em>
+    </h2>
+
+    <p>
+      One concise briefing covering the ideas, technologies and stories
+      shaping the world ahead.
+    </p>
+
+  </div>
+
+  <form id="newsletterForm">
+
+    <div class="newsletter-field">
+
+      <label for="email">Email address</label>
+
+      <input
+        id="email"
+        type="email"
+        placeholder="you@example.com"
+        autocomplete="email"
+        required
+      >
+
+    </div>
+
+    <button type="submit">
+      Subscribe
+      <span>↗</span>
+    </button>
+
+    <small id="newsletterMessage">
+      No noise. Unsubscribe anytime.
+    </small>
+
+  </form>
+
+</section>
+
+<footer class="site-footer">
+
+  <div class="section-wrap footer-top">
+
+    <div class="footer-brand">
+
+      <a class="brand" href="./index.html">
+        <span class="brand-mark">T</span>
+        <span class="brand-name">TRENDRADER</span>
+      </a>
+
+      <p>Independent digital news for Nigeria and the world.</p>
+
+    </div>
+
+    <div class="footer-index">
+      <span>EST. 2026</span>
+      <span>INDEPENDENT / DIGITAL</span>
+    </div>
+
+  </div>
+
+  <div class="section-wrap footer-bottom">
+
+    <span>© {{CURRENT_YEAR}} TrendRader Media</span>
+
+    <div>
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Contact</a>
+    </div>
+
+  </div>
+
+</footer>
+
+<div class="share-modal" id="shareModal" aria-hidden="true">
+
+  <div class="share-backdrop" id="shareBackdrop"></div>
+
+  <div
+    class="share-dialog"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="shareTitle"
+  >
+
+    <button
+      class="close-dialog"
+      id="closeShare"
+      type="button"
+      aria-label="Close"
+    >
+      ×
+    </button>
+
+    <span class="eyebrow">SHARE STORY</span>
+
+    <h2 id="shareTitle">Pass it on.</h2>
+
+    <div class="share-options">
+
+      <button data-share="copy" type="button">
+        <span>Copy link</span>
+        <b>↗</b>
+      </button>
+
+      <button data-share="x" type="button">
+        <span>X / Twitter</span>
+        <b>↗</b>
+      </button>
+
+      <button data-share="linkedin" type="button">
+        <span>LinkedIn</span>
+        <b>↗</b>
+      </button>
+
+    </div>
+
+    <p id="shareMessage"></p>
+
+  </div>
+
+</div>
+
+<div class="lightbox" id="lightbox" aria-hidden="true">
+
+  <button
+    id="closeLightbox"
+    type="button"
+    aria-label="Close image"
+  >
+    ×
+  </button>
+
+  <img id="lightboxImage" alt="">
+
+</div>
+
+<script id="articleRuntimeData" type="application/json">{{ARTICLE_RUNTIME_JSON}}</script>
+<script id="relatedArticlesData" type="application/json">{{RELATED_ARTICLES_JSON}}</script>
+<script src="./article.js"></script>
+
+</body>
+</html>
