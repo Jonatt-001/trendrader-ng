@@ -1,27 +1,18 @@
 (() => {
   "use strict";
 
-  const BASE_SITE = "https://trendrader.space";
-  const DB_PATH = "./assets/articles.json";
   const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const BASE_SITE = "https://trendrader.space";
 
   const state = {
     articles: [],
     filtered: [],
-    searchQuery: "",
-    loaded: false
+    categoryArticles: {},
+    initializedHome: false
   };
 
   const $ = (selector, root = document) => root.querySelector(selector);
   const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
-
-  function siteRootPrefix() {
-    return location.pathname.includes("/articles/") ? "../" : "./";
-  }
-
-  function articleDatabaseUrl() {
-    return new URL(`${siteRootPrefix()}assets/articles.json`, location.href).href;
-  }
 
   function escapeHtml(value) {
     return String(value ?? "").replace(/[&<>"']/g, (char) => ({
@@ -33,8 +24,16 @@
     }[char]));
   }
 
+  function siteRootPrefix() {
+    return location.pathname.includes("/articles/") ? "../" : "./";
+  }
+
+  function articleDatabaseUrl() {
+    return new URL(`${siteRootPrefix()}assets/articles.json`, location.href).href;
+  }
+
   function normalizeArticle(article) {
-    const normalized = {
+    return {
       ...article,
 
       title: String(
@@ -61,7 +60,6 @@
       imageAlt: String(
         article.imageAlt ||
         article.alt ||
-        article.title ||
         ""
       ).trim(),
 
@@ -112,71 +110,6 @@
         article.date ||
         ""
     };
-
-    normalized.categoryKey = normalizeCategory(normalized.category);
-
-    return normalized;
-  }
-
-  function normalizeCategory(value) {
-    const category = String(value || "")
-      .trim()
-      .toLowerCase();
-
-    if (
-      category.includes("politic") ||
-      category.includes("government") ||
-      category.includes("election")
-    ) {
-      return "politics";
-    }
-
-    if (
-      category.includes("tech") ||
-      category.includes("ai") ||
-      category.includes("science") ||
-      category.includes("digital")
-    ) {
-      return "technology";
-    }
-
-    if (
-      category.includes("business") ||
-      category.includes("econom") ||
-      category.includes("finance") ||
-      category.includes("market")
-    ) {
-      return "business";
-    }
-
-    if (
-      category.includes("entertain") ||
-      category.includes("culture") ||
-      category.includes("music") ||
-      category.includes("movie") ||
-      category.includes("celebr")
-    ) {
-      return "entertainment";
-    }
-
-    if (
-      category.includes("sport") ||
-      category.includes("football") ||
-      category.includes("basketball") ||
-      category.includes("athletics")
-    ) {
-      return "sports";
-    }
-
-    if (
-      category.includes("trend") ||
-      category.includes("viral") ||
-      category.includes("buzz")
-    ) {
-      return "trending";
-    }
-
-    return category || "news";
   }
 
   function isPublished(article) {
@@ -202,13 +135,19 @@
       return false;
     }
 
-    if (page && page !== "news") {
+    if (
+      page &&
+      page !== "news"
+    ) {
       return false;
     }
 
     return Boolean(
       article.title &&
-      (article.slug || article.url)
+      (
+        article.slug ||
+        article.url
+      )
     );
   }
 
@@ -225,7 +164,9 @@
       article.url &&
       article.url !== "#"
     ) {
-      if (/^https?:\/\//i.test(article.url)) {
+      if (
+        /^https?:\/\//i.test(article.url)
+      ) {
         return article.url;
       }
 
@@ -245,37 +186,29 @@
     ).href;
   }
 
-  function formatDate(value, options = {}) {
+  function formatDate(value, short = false) {
     const date = new Date(value);
 
-    if (Number.isNaN(date.getTime())) {
+    if (
+      Number.isNaN(
+        date.getTime()
+      )
+    ) {
       return "Recently published";
     }
 
     return new Intl.DateTimeFormat(
       "en-NG",
-      {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-        ...options
-      }
-    ).format(date);
-  }
-
-  function formatShortDate(value) {
-    const date = new Date(value);
-
-    if (Number.isNaN(date.getTime())) {
-      return "Latest";
-    }
-
-    return new Intl.DateTimeFormat(
-      "en-NG",
-      {
-        day: "numeric",
-        month: "short"
-      }
+      short
+        ? {
+            day:"numeric",
+            month:"short"
+          }
+        : {
+            day:"numeric",
+            month:"long",
+            year:"numeric"
+          }
     ).format(date);
   }
 
@@ -356,9 +289,1516 @@
     return "";
   }
 
+
+  /* =========================================================
+     SVG ICONS
+     ========================================================= */
+
+  function arrowSvg() {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h13"></path>
+        <path d="m13 6 6 6-6 6"></path>
+      </svg>
+    `;
+  }
+
+  function externalArrowSvg() {
+    return `
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <path d="M5 12h12"></path>
+        <path d="m13 6 6 6-6 6"></path>
+      </svg>
+    `;
+  }
+
+
+  /* =========================================================
+     IMAGE HELPERS
+     ========================================================= */
+
+  function imageMarkup(article, className = "") {
+    if (!article.image) {
+      return `
+        <div class="${className} image-fallback">
+          <span>TRENDRADER</span>
+        </div>
+      `;
+    }
+
+    return `
+      <div class="${className}">
+        <img
+          src="${escapeHtml(article.image)}"
+          alt="${escapeHtml(article.imageAlt || article.title)}"
+          loading="lazy"
+          decoding="async"
+          width="1200"
+          height="750"
+        >
+      </div>
+    `;
+  }
+
+  function attachImageFallbacks(root = document) {
+    $$("img", root).forEach((image) => {
+      if (
+        image.dataset.fallbackBound === "true"
+      ) {
+        return;
+      }
+
+      image.dataset.fallbackBound = "true";
+
+      image.addEventListener(
+        "error",
+        () => {
+          const parent = image.parentElement;
+
+          if (!parent) {
+            return;
+          }
+
+          image.remove();
+
+          parent.classList.add(
+            "image-fallback"
+          );
+
+          if (!parent.querySelector("span")) {
+            const label =
+              document.createElement("span");
+
+            label.textContent =
+              "TRENDRADER";
+
+            parent.appendChild(label);
+          }
+        },
+        {
+          once:true
+        }
+      );
+    });
+  }
+
+
+  /* =========================================================
+     HOMEPAGE CATEGORY NORMALIZATION
+     ========================================================= */
+
+  function categoryKey(article) {
+    const value = String(
+      article.category ||
+      ""
+    ).toLowerCase().trim();
+
+    if (
+      value.includes("politic")
+    ) {
+      return "politics";
+    }
+
+    if (
+      value.includes("tech") ||
+      value.includes("ai") ||
+      value.includes("science")
+    ) {
+      return "technology";
+    }
+
+    if (
+      value.includes("business") ||
+      value.includes("econom") ||
+      value.includes("finance") ||
+      value.includes("money")
+    ) {
+      return "business";
+    }
+
+    if (
+      value.includes("entertain") ||
+      value.includes("culture") ||
+      value.includes("music") ||
+      value.includes("movie") ||
+      value.includes("celebr")
+    ) {
+      return "entertainment";
+    }
+
+    if (
+      value.includes("sport")
+    ) {
+      return "sports";
+    }
+
+    if (
+      value.includes("trend")
+    ) {
+      return "trending";
+    }
+
+    const combined = `
+      ${article.title}
+      ${article.desc}
+      ${article.tag}
+    `.toLowerCase();
+
+    if (
+      /\btrending\b|\bviral\b|\bwhat's trending\b/.test(combined)
+    ) {
+      return "trending";
+    }
+
+    return null;
+  }
+
+  function buildCategoryBuckets(articles) {
+    const buckets = {
+      politics:[],
+      technology:[],
+      business:[],
+      entertainment:[],
+      sports:[],
+      trending:[]
+    };
+
+    articles.forEach((article) => {
+      const key = categoryKey(article);
+
+      if (
+        key &&
+        buckets[key]
+      ) {
+        buckets[key].push(article);
+      }
+    });
+
+    return buckets;
+  }
+
+
+  /* =========================================================
+     HOME CARD MARKUP
+     ========================================================= */
+
+  function storyMeta(article) {
+    return `
+      <div class="story-info">
+        <span>${escapeHtml(article.tag || article.category || "News")}</span>
+        <i></i>
+        <span>${escapeHtml(formatDate(article.date, true))}</span>
+      </div>
+    `;
+  }
+
+  function storyCard(article, index = 0) {
+    return `
+      <article class="story-card reveal">
+        <a
+          href="${escapeHtml(articleUrl(article))}"
+          aria-label="${escapeHtml(article.title)}"
+        >
+
+          <div class="story-image">
+
+            ${
+              article.image
+                ? `
+                  <img
+                    src="${escapeHtml(article.image)}"
+                    alt="${escapeHtml(article.imageAlt || article.title)}"
+                    loading="lazy"
+                    decoding="async"
+                    width="1000"
+                    height="625"
+                  >
+                `
+                : `
+                  <div class="image-fallback">
+                    <span>TRENDRADER</span>
+                  </div>
+                `
+            }
+
+            <span class="image-number">
+              ${String(index + 1).padStart(2, "0")}
+            </span>
+
+            <span class="story-arrow">
+              ${arrowSvg()}
+            </span>
+
+          </div>
+
+          ${storyMeta(article)}
+
+          <h3>
+            ${escapeHtml(article.title)}
+          </h3>
+
+          ${
+            article.desc
+              ? `
+                <p>
+                  ${escapeHtml(article.desc)}
+                </p>
+              `
+              : ""
+          }
+
+        </a>
+      </article>
+    `;
+  }
+
+  function featureHeroCard(article) {
+    return `
+      <article class="category-card category-card--hero reveal">
+
+        <a
+          href="${escapeHtml(articleUrl(article))}"
+          aria-label="${escapeHtml(article.title)}"
+        >
+
+          ${
+            article.image
+              ? `
+                <div class="category-image">
+
+                  <img
+                    src="${escapeHtml(article.image)}"
+                    alt="${escapeHtml(article.imageAlt || article.title)}"
+                    loading="lazy"
+                    decoding="async"
+                    width="1400"
+                    height="875"
+                  >
+
+                  <span class="story-arrow">
+                    ${arrowSvg()}
+                  </span>
+
+                </div>
+              `
+              : `
+                <div class="category-image image-fallback">
+                  <span>TRENDRADER</span>
+                </div>
+              `
+          }
+
+          <div class="category-card-content">
+
+            ${storyMeta(article)}
+
+            <h3>
+              ${escapeHtml(article.title)}
+            </h3>
+
+            ${
+              article.desc
+                ? `
+                  <p>
+                    ${escapeHtml(article.desc)}
+                  </p>
+                `
+                : ""
+            }
+
+          </div>
+
+        </a>
+
+      </article>
+    `;
+  }
+
+  function supportCard(article, index = 0) {
+    return `
+      <article class="category-card category-card--support reveal">
+
+        <a
+          href="${escapeHtml(articleUrl(article))}"
+          aria-label="${escapeHtml(article.title)}"
+        >
+
+          ${
+            article.image
+              ? `
+                <div class="category-image">
+
+                  <img
+                    src="${escapeHtml(article.image)}"
+                    alt="${escapeHtml(article.imageAlt || article.title)}"
+                    loading="lazy"
+                    decoding="async"
+                    width="600"
+                    height="450"
+                  >
+
+                </div>
+              `
+              : `
+                <div class="category-image image-fallback">
+                  <span>${String(index + 1).padStart(2, "0")}</span>
+                </div>
+              `
+          }
+
+          <div class="category-card-content">
+
+            ${storyMeta(article)}
+
+            <h3>
+              ${escapeHtml(article.title)}
+            </h3>
+
+          </div>
+
+        </a>
+
+      </article>
+    `;
+  }
+
+
+  /* =========================================================
+     FEATURE SECTION RENDERER
+     ========================================================= */
+
+  function renderFeatureSection(grid, articles) {
+    if (
+      !grid ||
+      !articles.length
+    ) {
+      return;
+    }
+
+    const hero = articles[0];
+
+    const supporting = articles
+      .slice(1, 5);
+
+    grid.innerHTML = `
+      ${featureHeroCard(hero)}
+
+      ${
+        supporting.length
+          ? `
+            <div class="category-support-list">
+              ${supporting
+                .map((article, index) =>
+                  supportCard(article, index)
+                )
+                .join("")}
+            </div>
+          `
+          : ""
+      }
+    `;
+  }
+
+
+  /* =========================================================
+     NORMAL CATEGORY CARDS
+     ========================================================= */
+
+  function renderCardSection(grid, articles) {
+    if (
+      !grid ||
+      !articles.length
+    ) {
+      return;
+    }
+
+    grid.innerHTML = articles
+      .slice(0, 6)
+      .map((article, index) =>
+        storyCard(article, index)
+      )
+      .join("");
+  }
+
+
+  /* =========================================================
+     SPORTS / COMPACT LIST
+     ========================================================= */
+
+  function renderListSection(grid, articles) {
+    if (
+      !grid ||
+      !articles.length
+    ) {
+      return;
+    }
+
+    grid.innerHTML = articles
+      .slice(0, 7)
+      .map((article, index) => `
+        <article class="category-card reveal">
+
+          <a
+            href="${escapeHtml(articleUrl(article))}"
+            aria-label="${escapeHtml(article.title)}"
+          >
+
+            ${
+              article.image
+                ? `
+                  <div class="category-image">
+
+                    <img
+                      src="${escapeHtml(article.image)}"
+                      alt="${escapeHtml(article.imageAlt || article.title)}"
+                      loading="lazy"
+                      decoding="async"
+                      width="800"
+                      height="500"
+                    >
+
+                  </div>
+                `
+                : `
+                  <div class="category-image image-fallback">
+                    <span>${String(index + 1).padStart(2, "0")}</span>
+                  </div>
+                `
+            }
+
+            <div>
+
+              ${storyMeta(article)}
+
+              <h3>
+                ${escapeHtml(article.title)}
+              </h3>
+
+              ${
+                article.desc
+                  ? `
+                    <p>
+                      ${escapeHtml(article.desc)}
+                    </p>
+                  `
+                  : ""
+              }
+
+            </div>
+
+          </a>
+
+        </article>
+      `)
+      .join("");
+  }
+
+
+  /* =========================================================
+     TECHNOLOGY DARK CARDS
+     ========================================================= */
+
+  function renderTechnology(grid, articles) {
+    if (
+      !grid ||
+      !articles.length
+    ) {
+      return;
+    }
+
+    grid.innerHTML = articles
+      .slice(0, 6)
+      .map((article) => `
+        <article
+          class="dark-card reveal"
+          tabindex="0"
+        >
+
+          <a
+            href="${escapeHtml(articleUrl(article))}"
+            aria-label="${escapeHtml(article.title)}"
+          >
+
+            ${
+              article.image
+                ? `
+                  <div>
+                    <img
+                      src="${escapeHtml(article.image)}"
+                      alt="${escapeHtml(article.imageAlt || article.title)}"
+                      loading="lazy"
+                      decoding="async"
+                      width="700"
+                      height="700"
+                    >
+                  </div>
+                `
+                : `
+                  <div class="image-fallback">
+                    <span>T</span>
+                  </div>
+                `
+            }
+
+            <div>
+
+              ${storyMeta(article)}
+
+              <h3>
+                ${escapeHtml(article.title)}
+              </h3>
+
+            </div>
+
+          </a>
+
+        </article>
+      `)
+      .join("");
+  }
+
+
+  /* =========================================================
+     CATEGORY SECTION MOUNTING
+     ========================================================= */
+
+  function mountCategorySection(key, articles) {
+    const section = $(
+      `[data-category="${key}"]`
+    );
+
+    if (!section) {
+      return;
+    }
+
+    if (!articles.length) {
+      section.hidden = true;
+      return;
+    }
+
+    section.hidden = false;
+
+    const grid = $(
+      `#${key}Grid`
+    );
+
+    if (!grid) {
+      return;
+    }
+
+    const layout =
+      section.dataset.layout ||
+      "cards";
+
+    if (
+      layout === "feature"
+    ) {
+      renderFeatureSection(
+        grid,
+        articles
+      );
+    } else if (
+      layout === "dark"
+    ) {
+      renderTechnology(
+        grid,
+        articles
+      );
+    } else if (
+      layout === "list"
+    ) {
+      renderListSection(
+        grid,
+        articles
+      );
+    } else {
+      renderCardSection(
+        grid,
+        articles
+      );
+    }
+  }
+
+
+  /* =========================================================
+     LEAD STORY
+     ========================================================= */
+
+  function renderLeadStory(article) {
+    const mount = $(
+      "#leadStoryMount"
+    );
+
+    if (
+      !mount ||
+      !article
+    ) {
+      return;
+    }
+
+    mount.innerHTML = `
+      <article class="lead-story reveal">
+
+        <a
+          href="${escapeHtml(articleUrl(article))}"
+          aria-label="${escapeHtml(article.title)}"
+        >
+
+          <div class="lead-image">
+
+            <div class="lead-image-inner">
+
+              ${
+                article.image
+                  ? `
+                    <img
+                      src="${escapeHtml(article.image)}"
+                      alt="${escapeHtml(article.imageAlt || article.title)}"
+                      fetchpriority="high"
+                      decoding="async"
+                      width="1400"
+                      height="788"
+                    >
+                  `
+                  : `
+                    <div class="image-fallback">
+                      <span>TRENDRADER</span>
+                    </div>
+                  `
+              }
+
+            </div>
+
+            <div class="image-shade"></div>
+
+            <div class="lead-index">
+              <span>01</span>
+              <i></i>
+              <span>LEAD STORY</span>
+            </div>
+
+            <span class="lead-arrow">
+              ${arrowSvg()}
+            </span>
+
+          </div>
+
+          <div class="lead-content">
+
+            <div class="story-category">
+              <span>${escapeHtml(article.tag || article.category || "News")}</span>
+              <i></i>
+              <span>${escapeHtml(formatDate(article.date, true))}</span>
+            </div>
+
+            <h2>
+              ${escapeHtml(article.title)}
+            </h2>
+
+            ${
+              article.desc
+                ? `
+                  <p>
+                    ${escapeHtml(article.desc)}
+                  </p>
+                `
+                : ""
+            }
+
+            <div class="story-byline">
+              <span>${escapeHtml(article.author || "TrendRader Editorial")}</span>
+              <span class="byline-line"></span>
+              <span>${readTime(article)} min read</span>
+            </div>
+
+          </div>
+
+        </a>
+
+      </article>
+    `;
+
+    attachImageFallbacks(
+      mount
+    );
+
+    observeReveals(
+      mount
+    );
+  }
+
+
+  /* =========================================================
+     LATEST STORIES
+     ========================================================= */
+
+  function renderLatest(articles) {
+    const grid = $(
+      "#latestGrid"
+    );
+
+    if (!grid) {
+      return;
+    }
+
+    if (!articles.length) {
+      grid.innerHTML = "";
+      return;
+    }
+
+    grid.innerHTML = articles
+      .slice(0, 6)
+      .map((article, index) =>
+        storyCard(
+          article,
+          index
+        )
+      )
+      .join("");
+
+    attachImageFallbacks(
+      grid
+    );
+
+    observeReveals(
+      grid
+    );
+  }
+
+
+  /* =========================================================
+     TICKER
+     ========================================================= */
+
+  function renderTicker(articles) {
+    const ticker = $(
+      "#liveTicker"
+    );
+
+    const track = $(
+      "#tickerTrack"
+    );
+
+    if (
+      !ticker ||
+      !track ||
+      !articles.length
+    ) {
+      if (ticker) {
+        ticker.hidden = true;
+      }
+
+      return;
+    }
+
+    const items = articles
+      .slice(0, 8);
+
+    const content = items
+      .map((article) => `
+        <a href="${escapeHtml(articleUrl(article))}">
+          ${escapeHtml(article.title)}
+        </a>
+        <i>•</i>
+      `)
+      .join("");
+
+    track.innerHTML = `
+      <div class="ticker-content">
+        ${content}
+      </div>
+
+      <div class="ticker-content" aria-hidden="true">
+        ${content}
+      </div>
+    `;
+
+    ticker.hidden = false;
+  }
+
+
+  /* =========================================================
+     HOME PAGE INITIALIZATION
+     ========================================================= */
+
+  async function initHomePage() {
+    if (
+      state.initializedHome
+    ) {
+      return;
+    }
+
+    state.initializedHome = true;
+
+    const feedStatus = $(
+      "#feedStatus"
+    );
+
+    try {
+      if (feedStatus) {
+        feedStatus.textContent =
+          "Loading published stories...";
+
+        feedStatus.dataset.state =
+          "loading";
+      }
+
+      const payload =
+        await fetchJson(
+          articleDatabaseUrl()
+        );
+
+      const raw =
+        Array.isArray(payload)
+          ? payload
+          : Array.isArray(payload.articles)
+            ? payload.articles
+            : Array.isArray(payload.items)
+              ? payload.items
+              : [];
+
+      const articles =
+        sortArticles(
+          raw
+            .map(normalizeArticle)
+            .filter(isPublished)
+        );
+
+      state.articles = articles;
+      state.filtered = articles;
+
+      if (!articles.length) {
+        showGlobalEmptyState();
+
+        if (feedStatus) {
+          feedStatus.textContent =
+            "No published stories";
+
+          feedStatus.dataset.state =
+            "error";
+        }
+
+        return;
+      }
+
+      hideGlobalEmptyState();
+
+      const todayLabel = $(
+        "#todayLabel"
+      );
+
+      if (todayLabel) {
+        todayLabel.textContent =
+          new Intl.DateTimeFormat(
+            "en-NG",
+            {
+              weekday:"long"
+            }
+          ).format(
+            new Date()
+          ).toUpperCase();
+      }
+
+      const heroDate = $(
+        "#heroDate"
+      );
+
+      if (heroDate) {
+        heroDate.textContent =
+          `${articles.length} published ${
+            articles.length === 1
+              ? "story"
+              : "stories"
+          }`;
+      }
+
+      if (feedStatus) {
+        feedStatus.textContent =
+          `${articles.length} ${
+            articles.length === 1
+              ? "story"
+              : "stories"
+          } published`;
+
+        feedStatus.dataset.state =
+          "live";
+      }
+
+      renderLeadStory(
+        articles[0]
+      );
+
+      renderLatest(
+        articles
+      );
+
+      renderTicker(
+        articles
+      );
+
+      state.categoryArticles =
+        buildCategoryBuckets(
+          articles
+        );
+
+      Object.entries(
+        state.categoryArticles
+      ).forEach(
+        ([key, categoryArticles]) => {
+          mountCategorySection(
+            key,
+            categoryArticles
+          );
+        }
+      );
+
+      attachImageFallbacks();
+
+      observeReveals();
+
+      setupSearchData(
+        articles
+      );
+
+    } catch (error) {
+
+      console.error(
+        "TrendRader homepage feed failed:",
+        error
+      );
+
+      if (feedStatus) {
+        feedStatus.textContent =
+          "Published feed unavailable";
+
+        feedStatus.dataset.state =
+          "error";
+      }
+
+      showGlobalEmptyState(
+        true
+      );
+    }
+  }
+
+
+  /* =========================================================
+     EMPTY STATE
+     ========================================================= */
+
+  function showGlobalEmptyState(feedError = false) {
+    const empty = $(
+      "#emptyState"
+    );
+
+    if (!empty) {
+      return;
+    }
+
+    empty.hidden = false;
+
+    const heading = $(
+      "h2",
+      empty
+    );
+
+    const paragraph = $(
+      "p",
+      empty
+    );
+
+    if (feedError) {
+      if (heading) {
+        heading.textContent =
+          "The news desk is temporarily unavailable.";
+      }
+
+      if (paragraph) {
+        paragraph.textContent =
+          "Published stories could not be loaded right now. Please try again shortly.";
+      }
+    }
+  }
+
+  function hideGlobalEmptyState() {
+    const empty = $(
+      "#emptyState"
+    );
+
+    if (empty) {
+      empty.hidden = true;
+    }
+  }
+
+
+  /* =========================================================
+     SEARCH
+     ========================================================= */
+
+  let searchArticles = [];
+
+  function setupSearchData(articles) {
+    searchArticles = articles;
+  }
+
+  function setupSearch() {
+    const toggle = $(
+      "#searchToggle"
+    );
+
+    const panel = $(
+      "#searchPanel"
+    );
+
+    const input = $(
+      "#searchInput"
+    );
+
+    const form = $(
+      "#searchForm"
+    );
+
+    if (
+      !toggle ||
+      !panel
+    ) {
+      return;
+    }
+
+    const close = () => {
+      panel.classList.remove(
+        "open"
+      );
+
+      panel.setAttribute(
+        "aria-hidden",
+        "true"
+      );
+
+      toggle.setAttribute(
+        "aria-expanded",
+        "false"
+      );
+    };
+
+    const open = () => {
+      panel.classList.add(
+        "open"
+      );
+
+      panel.setAttribute(
+        "aria-hidden",
+        "false"
+      );
+
+      toggle.setAttribute(
+        "aria-expanded",
+        "true"
+      );
+
+      window.setTimeout(
+        () => input?.focus(),
+        120
+      );
+    };
+
+    toggle.addEventListener(
+      "click",
+      () => {
+        const isOpen =
+          panel.classList.contains(
+            "open"
+          );
+
+        if (isOpen) {
+          close();
+        } else {
+          open();
+        }
+      }
+    );
+
+    form?.addEventListener(
+      "submit",
+      (event) => {
+        event.preventDefault();
+
+        const query =
+          String(
+            input?.value ||
+            ""
+          ).trim().toLowerCase();
+
+        if (!query) {
+          input?.focus();
+          return;
+        }
+
+        const match =
+          searchArticles.find(
+            (article) => {
+              const haystack = `
+                ${article.title}
+                ${article.desc}
+                ${article.category}
+                ${article.tag}
+              `.toLowerCase();
+
+              return haystack.includes(
+                query
+              );
+            }
+          );
+
+        if (match) {
+          location.href =
+            articleUrl(match);
+
+          return;
+        }
+
+        if (input) {
+          input.value = "";
+
+          input.placeholder =
+            "No matching story found";
+        }
+      }
+    );
+
+    document.addEventListener(
+      "keydown",
+      (event) => {
+        if (
+          event.key === "Escape"
+        ) {
+          close();
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     NAVIGATION
+     ========================================================= */
+
+  function setupNavigation() {
+    const menuToggle = $(
+      "#menuToggle"
+    );
+
+    const mobileNav = $(
+      "#mobileNav"
+    );
+
+    if (
+      !menuToggle ||
+      !mobileNav
+    ) {
+      return;
+    }
+
+    menuToggle.addEventListener(
+      "click",
+      () => {
+        const open =
+          mobileNav.classList.toggle(
+            "open"
+          );
+
+        menuToggle.classList.toggle(
+          "menu-open",
+          open
+        );
+
+        menuToggle.setAttribute(
+          "aria-expanded",
+          String(open)
+        );
+
+        menuToggle.setAttribute(
+          "aria-label",
+          open
+            ? "Close menu"
+            : "Open menu"
+        );
+      }
+    );
+
+    $$(".mobile-nav a")
+      .forEach(
+        (link) => {
+          link.addEventListener(
+            "click",
+            () => {
+              mobileNav.classList.remove(
+                "open"
+              );
+
+              menuToggle.classList.remove(
+                "menu-open"
+              );
+
+              menuToggle.setAttribute(
+                "aria-expanded",
+                "false"
+              );
+
+              menuToggle.setAttribute(
+                "aria-label",
+                "Open menu"
+              );
+            }
+          );
+        }
+      );
+  }
+
+
+  /* =========================================================
+     SCROLL
+     ========================================================= */
+
+  function setupScroll() {
+    const progress = $(
+      "#progressBar"
+    );
+
+    const header = $(
+      "#siteHeader"
+    );
+
+    const update = () => {
+      const max =
+        document.documentElement
+          .scrollHeight -
+        window.innerHeight;
+
+      if (progress) {
+        progress.style.width =
+          `${
+            max > 0
+              ? (
+                  window.scrollY /
+                  max
+                ) * 100
+              : 0
+          }%`;
+      }
+
+      header?.classList.toggle(
+        "scrolled",
+        window.scrollY > 12
+      );
+    };
+
+    window.addEventListener(
+      "scroll",
+      update,
+      {
+        passive:true
+      }
+    );
+
+    update();
+  }
+
+
+  /* =========================================================
+     NEWSLETTER
+     ========================================================= */
+
+  function setupNewsletter() {
+    const form = $(
+      "#newsletterForm"
+    );
+
+    if (!form) {
+      return;
+    }
+
+    form.addEventListener(
+      "submit",
+      (event) => {
+        event.preventDefault();
+
+        const email = $(
+          "#newsletterEmail"
+        );
+
+        const message = $(
+          "#newsletterMessage"
+        );
+
+        if (
+          !email ||
+          !email.validity.valid
+        ) {
+          email?.focus();
+          return;
+        }
+
+        email.value = "";
+
+        if (message) {
+          message.textContent =
+            "You're on the list. Welcome to TrendRader.";
+        }
+      }
+    );
+  }
+
+
+  /* =========================================================
+     CURSOR GLOW
+     ========================================================= */
+
+  function setupCursor() {
+    const glow = $(
+      ".cursor-glow"
+    );
+
+    if (
+      !glow ||
+      reducedMotion ||
+      !window.matchMedia(
+        "(hover:hover)"
+      ).matches
+    ) {
+      return;
+    }
+
+    let visible = false;
+
+    window.addEventListener(
+      "pointermove",
+      (event) => {
+        glow.style.left =
+          `${event.clientX}px`;
+
+        glow.style.top =
+          `${event.clientY}px`;
+
+        if (!visible) {
+          visible = true;
+          glow.style.opacity = "1";
+        }
+      },
+      {
+        passive:true
+      }
+    );
+
+    window.addEventListener(
+      "pointerleave",
+      () => {
+        glow.style.opacity = "0";
+        visible = false;
+      }
+    );
+  }
+
+
+  /* =========================================================
+     REVEALS
+     ========================================================= */
+
+  function observeReveals(root = document) {
+    if (
+      reducedMotion ||
+      !("IntersectionObserver" in window)
+    ) {
+      $$(".reveal", root).forEach(
+        (element) => {
+          element.classList.add(
+            "visible"
+          );
+        }
+      );
+
+      return;
+    }
+
+    document.documentElement.classList.add(
+      "js-reveal-enabled"
+    );
+
+    const observer =
+      new IntersectionObserver(
+        (entries) => {
+          entries.forEach(
+            (entry) => {
+              if (
+                entry.isIntersecting
+              ) {
+                entry.target.classList.add(
+                  "visible"
+                );
+
+                observer.unobserve(
+                  entry.target
+                );
+              }
+            }
+          );
+        },
+        {
+          threshold:.08,
+          rootMargin:
+            "0px 0px -30px"
+        }
+      );
+
+    $$(".reveal", root)
+      .forEach(
+        (element, index) => {
+          element.style.transitionDelay =
+            `${Math.min(
+              index * 35,
+              180
+            )}ms`;
+
+          observer.observe(
+            element
+          );
+        }
+      );
+  }
+
+
+  /* =========================================================
+     GENERIC JSON FETCH
+     ========================================================= */
+
+  async function fetchJson(path) {
+    const response =
+      await fetch(
+        path,
+        {
+          cache:"no-store"
+        }
+      );
+
+    if (!response.ok) {
+      throw new Error(
+        `${path} returned ${response.status}`
+      );
+    }
+
+    return response.json();
+  }
+
+
+  /* =========================================================
+     ARTICLE PAGE SUPPORT
+     ========================================================= */
+
   function safeBodyHtml(html) {
     const template =
-      document.createElement("template");
+      document.createElement(
+        "template"
+      );
 
     template.innerHTML =
       String(html || "");
@@ -367,23 +1807,32 @@
       .querySelectorAll(
         "script,style,object,embed,form"
       )
-      .forEach((node) => node.remove());
+      .forEach(
+        (node) => node.remove()
+      );
 
     template.content
       .querySelectorAll(
         "[onload],[onclick],[onerror],[onmouseover]"
       )
-      .forEach((node) => {
-        [...node.attributes].forEach(
-          (attr) => {
-            if (/^on/i.test(attr.name)) {
-              node.removeAttribute(
-                attr.name
-              );
-            }
-          }
-        );
-      });
+      .forEach(
+        (node) => {
+          [...node.attributes]
+            .forEach(
+              (attr) => {
+                if (
+                  /^on/i.test(
+                    attr.name
+                  )
+                ) {
+                  node.removeAttribute(
+                    attr.name
+                  );
+                }
+              }
+            );
+        }
+      );
 
     return template.innerHTML;
   }
@@ -442,109 +1891,115 @@
       }
     };
 
-    delta.ops.forEach((op) => {
-      const insert = op.insert;
+    delta.ops.forEach(
+      (op) => {
+        const insert =
+          op.insert;
 
-      if (
-        typeof insert === "object" &&
-        insert.image
-      ) {
-        line += `
-          <img
-            src="${escapeHtml(insert.image)}"
-            alt="TrendRader article image"
-            loading="lazy"
-          >
-        `;
+        if (
+          typeof insert === "object" &&
+          insert.image
+        ) {
+          line += `
+            <img
+              src="${escapeHtml(insert.image)}"
+              alt="TrendRader article image"
+              loading="lazy"
+            >
+          `;
 
-        return;
-      }
-
-      if (
-        typeof insert !== "string"
-      ) {
-        return;
-      }
-
-      const lines =
-        insert.split("\n");
-
-      lines.forEach(
-        (part, index) => {
-          if (part) {
-            line += inlineFormat(
-              part,
-              op.attributes || {}
-            );
-          }
-
-          if (
-            index ===
-            lines.length - 1
-          ) {
-            return;
-          }
-
-          const attrs =
-            op.attributes || {};
-
-          const block =
-            attrs.header
-              ? `h${Math.min(
-                  3,
-                  Math.max(
-                    2,
-                    Number(attrs.header)
-                  )
-                )}`
-              : attrs.blockquote
-                ? "blockquote"
-                : attrs.list === "ordered"
-                  ? "ol"
-                  : attrs.list === "bullet"
-                    ? "ul"
-                    : null;
-
-          if (
-            block === "ol" ||
-            block === "ul"
-          ) {
-            if (
-              listType !==
-              block
-            ) {
-              closeList();
-              listType = block;
-              html +=
-                `<${block}>`;
-            }
-
-            html +=
-              `<li>${line}</li>`;
-          } else {
-            closeList();
-
-            if (
-              block ===
-              "blockquote"
-            ) {
-              html +=
-                `<blockquote><p>${line}</p></blockquote>`;
-            } else if (block) {
-              html +=
-                `<${block}>${line}</${block}>`;
-            } else if (
-              line.trim()
-            ) {
-              html +=
-                `<p>${line}</p>`;
-            }
-          }
-
-          line = "";
+          return;
         }
-      );
-    });
+
+        if (
+          typeof insert !== "string"
+        ) {
+          return;
+        }
+
+        const lines =
+          insert.split("\n");
+
+        lines.forEach(
+          (part, index) => {
+            if (part) {
+              line += inlineFormat(
+                part,
+                op.attributes || {}
+              );
+            }
+
+            if (
+              index ===
+              lines.length - 1
+            ) {
+              return;
+            }
+
+            const attrs =
+              op.attributes || {};
+
+            const block =
+              attrs.header
+                ? `h${Math.min(
+                    3,
+                    Math.max(
+                      2,
+                      Number(
+                        attrs.header
+                      )
+                    )
+                  )}`
+                : attrs.blockquote
+                  ? "blockquote"
+                  : attrs.list === "ordered"
+                    ? "ol"
+                    : attrs.list === "bullet"
+                      ? "ul"
+                      : null;
+
+            if (
+              block === "ol" ||
+              block === "ul"
+            ) {
+              if (
+                listType !==
+                block
+              ) {
+                closeList();
+                listType =
+                  block;
+                html += `<${block}>`;
+              }
+
+              html += `<li>${line}</li>`;
+            } else {
+              closeList();
+
+              if (
+                block ===
+                "blockquote"
+              ) {
+                html +=
+                  `<blockquote><p>${line}</p></blockquote>`;
+              } else if (
+                block
+              ) {
+                html +=
+                  `<${block}>${line}</${block}>`;
+              } else if (
+                line.trim()
+              ) {
+                html +=
+                  `<p>${line}</p>`;
+              }
+            }
+
+            line = "";
+          }
+        );
+      }
+    );
 
     closeList();
 
@@ -555,1529 +2010,55 @@
     return html;
   }
 
-  async function fetchJson(path) {
-    const response =
-      await fetch(
-        path,
-        {
-          cache: "no-store",
-          headers: {
-            "Accept":
-              "application/json"
-          }
-        }
-      );
-
-    if (!response.ok) {
-      throw new Error(
-        `${path} returned ${response.status}`
-      );
-    }
-
-    return response.json();
-  }
-
-  function iconArrow() {
-    return `
-      <svg
-        viewBox="0 0 24 24"
-        aria-hidden="true"
-      >
-        <path d="M5 12h13"></path>
-        <path d="m13 7 5 5-5 5"></path>
-      </svg>
-    `;
-  }
-
-  function safeImageMarkup(
-    article,
-    className,
-    index = ""
-  ) {
-    const title =
-      escapeHtml(
-        article.imageAlt ||
-        article.title
-      );
-
-    const number =
-      index !== ""
-        ? `
-          <span class="image-number">
-            ${String(index).padStart(2, "0")}
-          </span>
-        `
-        : "";
-
-    if (!article.image) {
-      return `
-        <div
-          class="${className} image-fallback"
-          aria-label="No image available"
-        >
-          <span>TRENDRADER</span>
-          ${number}
-        </div>
-      `;
-    }
-
-    return `
-      <div class="${className}">
-        <img
-          src="${escapeHtml(article.image)}"
-          alt="${title}"
-          loading="lazy"
-          decoding="async"
-          width="1200"
-          height="750"
-          onerror="this.closest('.${className.split(" ")[0]}')?.classList.add('image-load-failed');"
-        >
-        ${number}
-      </div>
-    `;
-  }
-
-  function renderLeadStory(article) {
-    const mount =
-      $("#leadStoryMount");
-
-    if (!mount || !article) {
-      return;
-    }
-
-    const url =
-      articleUrl(article);
-
-    mount.innerHTML = `
-      <article
-        class="lead-story reveal"
-        data-reveal
-      >
-        <a
-          href="${escapeHtml(url)}"
-          aria-label="Read: ${escapeHtml(article.title)}"
-        >
-
-          <div class="lead-image">
-
-            <div class="lead-image-inner">
-              ${
-                article.image
-                  ? `
-                    <img
-                      src="${escapeHtml(article.image)}"
-                      alt="${escapeHtml(article.imageAlt || article.title)}"
-                      width="1400"
-                      height="788"
-                      fetchpriority="high"
-                      decoding="async"
-                    >
-                  `
-                  : `
-                    <div
-                      class="image-fallback"
-                      style="width:100%;height:100%;display:grid;place-items:center"
-                    >
-                      <span>TRENDRADER</span>
-                    </div>
-                  `
-              }
-            </div>
-
-            <div
-              class="image-shade"
-              aria-hidden="true"
-            ></div>
-
-            <div class="lead-index">
-              <span>LEAD STORY</span>
-              <i></i>
-              <span>${escapeHtml(formatShortDate(article.date))}</span>
-            </div>
-
-            <div
-              class="lead-arrow"
-              aria-hidden="true"
-            >
-              ${iconArrow()}
-            </div>
-
-          </div>
-
-          <div class="lead-content">
-
-            <div class="story-category">
-              <span>${escapeHtml(article.tag || article.category)}</span>
-              <i></i>
-              <span>${escapeHtml(article.category)}</span>
-            </div>
-
-            <h2>
-              ${formatEditorialTitle(
-                article.title
-              )}
-            </h2>
-
-            ${
-              article.desc
-                ? `
-                  <p>
-                    ${escapeHtml(article.desc)}
-                  </p>
-                `
-                : ""
-            }
-
-            <div class="story-byline">
-              <span>${escapeHtml(article.author)}</span>
-              <span class="byline-line"></span>
-              <span>${escapeHtml(formatDate(article.date))}</span>
-            </div>
-
-          </div>
-        </a>
-      </article>
-    `;
-
-    observeReveals(mount);
-  }
-
-  function formatEditorialTitle(title) {
-    const safe =
-      escapeHtml(title);
-
-    const words =
-      safe.split(/\s+/);
-
-    if (words.length < 7) {
-      return safe;
-    }
-
-    const splitAt =
-      Math.max(
-        3,
-        Math.floor(
-          words.length * 0.62
-        )
-      );
-
-    const first =
-      words.slice(0, splitAt).join(" ");
-
-    const second =
-      words.slice(splitAt).join(" ");
-
-    return `
-      ${first}
-      <em>${second}</em>
-    `;
-  }
-
-  function renderStoryCard(
-    article,
-    index = 0
-  ) {
-    const url =
-      articleUrl(article);
-
-    return `
-      <article class="story-card reveal">
-
-        <a
-          href="${escapeHtml(url)}"
-          aria-label="Read: ${escapeHtml(article.title)}"
-        >
-
-          ${safeImageMarkup(
-            article,
-            "story-image",
-            index + 1
-          )}
-
-          <div class="story-info">
-            <span>${escapeHtml(article.tag || article.category)}</span>
-            <i></i>
-            <span>${escapeHtml(article.category)}</span>
-          </div>
-
-          <h3>
-            ${escapeHtml(article.title)}
-          </h3>
-
-          ${
-            article.desc
-              ? `
-                <p>
-                  ${escapeHtml(
-                    truncate(
-                      article.desc,
-                      150
-                    )
-                  )}
-                </p>
-              `
-              : ""
-          }
-
-        </a>
-      </article>
-    `;
-  }
-
-  function renderCategoryCard(
-    article,
-    index = 0
-  ) {
-    const url =
-      articleUrl(article);
-
-    return `
-      <article class="category-card reveal">
-
-        <a
-          href="${escapeHtml(url)}"
-          aria-label="Read: ${escapeHtml(article.title)}"
-        >
-
-          ${safeImageMarkup(
-            article,
-            "category-image",
-            index + 1
-          )}
-
-          <div>
-
-            <div class="story-info">
-              <span>${escapeHtml(article.tag || article.category)}</span>
-              <i></i>
-              <span>${escapeHtml(formatShortDate(article.date))}</span>
-            </div>
-
-            <h3>
-              ${escapeHtml(article.title)}
-            </h3>
-
-            ${
-              article.desc
-                ? `
-                  <p>
-                    ${escapeHtml(
-                      truncate(
-                        article.desc,
-                        125
-                      )
-                    )}
-                  </p>
-                `
-                : ""
-            }
-
-          </div>
-
-        </a>
-
-      </article>
-    `;
-  }
-
-  function renderDarkCard(
-    article,
-    index = 0
-  ) {
-    const url =
-      articleUrl(article);
-
-    return `
-      <article class="dark-card reveal">
-
-        <a
-          href="${escapeHtml(url)}"
-          aria-label="Read: ${escapeHtml(article.title)}"
-          style="display:contents"
-        >
-
-          <div>
-            ${
-              article.image
-                ? `
-                  <img
-                    src="${escapeHtml(article.image)}"
-                    alt="${escapeHtml(article.imageAlt || article.title)}"
-                    loading="lazy"
-                    decoding="async"
-                    width="500"
-                    height="500"
-                  >
-                `
-                : `
-                  <div
-                    class="image-fallback"
-                    style="width:100%;height:100%;display:grid;place-items:center"
-                  >
-                    <span>TRENDRADER</span>
-                  </div>
-                `
-            }
-          </div>
-
-          <div>
-
-            <div class="story-info">
-              <span>${escapeHtml(article.tag || article.category)}</span>
-              <i></i>
-              <span>${escapeHtml(formatShortDate(article.date))}</span>
-            </div>
-
-            <h3>
-              ${escapeHtml(article.title)}
-            </h3>
-
-          </div>
-
-        </a>
-
-      </article>
-    `;
-  }
-
-  function renderEmptyGrid(
-    grid,
-    title = "No stories here yet."
-  ) {
-    if (!grid) {
-      return;
-    }
-
-    grid.innerHTML = `
-      <div class="feed-empty">
-        <strong>${escapeHtml(title)}</strong>
-        <span>
-          Published stories will appear here automatically.
-        </span>
-      </div>
-    `;
-  }
-
-  function categoryMatches(
-    article,
-    category
-  ) {
-    const key =
-      normalizeCategory(
-        article.category
-      );
-
-    if (key === category) {
-      return true;
-    }
-
-    const tag =
-      normalizeCategory(
-        article.tag
-      );
-
-    return tag === category;
-  }
-
-  function renderLatest(
-    articles
-  ) {
-    const grid =
-      $("#latestGrid");
-
-    if (!grid) {
-      return;
-    }
-
-    const latest =
-      articles.slice(0, 7);
-
-    if (!latest.length) {
-      renderEmptyGrid(
-        grid,
-        "No published stories yet."
-      );
-      return;
-    }
-
-    grid.innerHTML =
-      latest
-        .map(
-          (article, index) =>
-            renderStoryCard(
-              article,
-              index
-            )
-        )
-        .join("");
-
-    observeReveals(grid);
-  }
-
-  function renderCategory(
-    category,
-    articles,
-    limit = 3
-  ) {
-    const grid =
-      $(`#${category}Grid`);
-
-    if (!grid) {
-      return;
-    }
-
-    const items =
-      articles
-        .filter(
-          (article) =>
-            categoryMatches(
-              article,
-              category
-            )
-        )
-        .slice(0, limit);
-
-    if (!items.length) {
-      renderEmptyGrid(
-        grid,
-        `No ${categoryLabel(category)} stories yet.`
-      );
-      return;
-    }
-
-    if (category === "technology") {
-      grid.innerHTML =
-        items
-          .map(
-            (article, index) =>
-              renderDarkCard(
-                article,
-                index
-              )
-          )
-          .join("");
-    } else {
-      grid.innerHTML =
-        items
-          .map(
-            (article, index) =>
-              renderCategoryCard(
-                article,
-                index
-              )
-          )
-          .join("");
-    }
-
-    observeReveals(grid);
-  }
-
-  function categoryLabel(
-    category
-  ) {
-    const labels = {
-      politics:"politics",
-      technology:"technology",
-      business:"business",
-      entertainment:"entertainment",
-      sports:"sports",
-      trending:"trending"
-    };
-
-    return (
-      labels[category] ||
-      "news"
-    );
-  }
-
-  function deriveTrending(
-    articles
-  ) {
-    const explicit =
-      articles.filter(
-        (article) =>
-          categoryMatches(
-            article,
-            "trending"
-          )
-      );
-
-    if (explicit.length >= 3) {
-      return explicit;
-    }
-
-    return [...articles]
-      .sort(
-        (a, b) =>
-          Number(b.views || b.engagement || 0) -
-            Number(a.views || a.engagement || 0) ||
-          new Date(b.date || 0) -
-            new Date(a.date || 0)
-      )
-      .slice(0, 3);
-  }
-
-  function renderHomepage(
-    articles
-  ) {
-    const published =
-      sortArticles(
-        articles
-          .map(normalizeArticle)
-          .filter(isPublished)
-      );
-
-    state.articles =
-      published;
-
-    state.filtered =
-      published;
-
-    state.loaded = true;
-
-    const empty =
-      $("#emptyState");
-
-    if (!published.length) {
-      if (empty) {
-        empty.hidden = false;
-      }
-
-      renderLatest([]);
-      renderCategory(
-        "politics",
-        []
-      );
-      renderCategory(
-        "technology",
-        []
-      );
-      renderCategory(
-        "business",
-        []
-      );
-      renderCategory(
-        "entertainment",
-        []
-      );
-      renderCategory(
-        "sports",
-        []
-      );
-      renderCategory(
-        "trending",
-        []
-      );
-
-      updateFeedStatus(
-        "No published stories",
-        "error"
-      );
-
-      return;
-    }
-
-    if (empty) {
-      empty.hidden = true;
-    }
-
-    renderLeadStory(
-      published[0]
-    );
-
-    renderLatest(
-      published
-    );
-
-    renderCategory(
-      "politics",
-      published
-    );
-
-    renderCategory(
-      "technology",
-      published
-    );
-
-    renderCategory(
-      "business",
-      published
-    );
-
-    renderCategory(
-      "entertainment",
-      published
-    );
-
-    renderCategory(
-      "sports",
-      published
-    );
-
-    const trending =
-      deriveTrending(
-        published
-      );
-
-    renderCategory(
-      "trending",
-      trending
-    );
-
-    renderTicker(
-      published
-    );
-
-    updateHomepageMeta(
-      published
-    );
-
-    updateFeedStatus(
-      `${published.length} published ${published.length === 1 ? "story" : "stories"}`,
-      "live"
-    );
-
-    setupImageFallbacks();
-  }
-
-  function updateHomepageMeta(
-    articles
-  ) {
-    const latest =
-      articles[0];
-
-    const heroDate =
-      $("#heroDate");
-
-    if (heroDate && latest) {
-      heroDate.textContent =
-        `Updated ${formatDate(latest.date)}`;
-    }
-
-    const today =
-      $("#todayLabel");
-
-    if (today) {
-      today.textContent =
-        new Intl.DateTimeFormat(
-          "en-NG",
-          {
-            weekday:"long",
-            day:"numeric",
-            month:"short"
-          }
-        ).format(
-          new Date()
-        ).toUpperCase();
-    }
-  }
-
-  function updateFeedStatus(
-    text,
-    stateName = ""
-  ) {
-    const status =
-      $("#feedStatus");
-
-    if (!status) {
-      return;
-    }
-
-    status.textContent =
-      text;
-
-    if (stateName) {
-      status.dataset.state =
-        stateName;
-    } else {
-      delete status.dataset.state;
-    }
-  }
-
-  function renderTicker(
-    articles
-  ) {
-    const ticker =
-      $("#liveTicker");
-
-    const track =
-      $("#tickerTrack");
-
-    if (
-      !ticker ||
-      !track ||
-      !articles.length
-    ) {
-      return;
-    }
-
-    const items =
-      articles
-        .slice(0, 8)
-        .map(
-          (article) => `
-            <a href="${escapeHtml(articleUrl(article))}">
-              ${escapeHtml(article.title)}
-            </a>
-            <i>/</i>
-          `
-        )
-        .join("");
-
-    track.innerHTML = `
-      <div class="ticker-content">
-        ${items}
-      </div>
-
-      <div
-        class="ticker-content"
-        aria-hidden="true"
-      >
-        ${items}
-      </div>
-    `;
-
-    ticker.hidden = false;
-
-    if (reducedMotion) {
-      $$(".ticker-content").forEach(
-        (element) => {
-          element.style.animation =
-            "none";
-        }
-      );
-    }
-  }
-
-  function truncate(
-    value,
-    max
-  ) {
-    const text =
-      String(value || "")
-        .trim();
-
-    if (
-      text.length <= max
-    ) {
-      return text;
-    }
-
-    return `${text
-      .slice(0, max)
-      .replace(/\s+\S*$/, "")}…`;
-  }
-
-  function setupImageFallbacks() {
-    $$("img").forEach(
-      (image) => {
-        image.addEventListener(
-          "error",
-          () => {
-            const wrapper =
-              image.closest(
-                ".story-image,.category-image,.lead-image-inner,.dark-card > div:first-child"
-              );
-
-            if (!wrapper) {
-              return;
-            }
-
-            wrapper.classList.add(
-              "image-fallback"
-            );
-
-            image.remove();
-
-            if (
-              !wrapper.querySelector(
-                "span"
-              )
-            ) {
-              const label =
-                document.createElement(
-                  "span"
-                );
-
-              label.textContent =
-                "TRENDRADER";
-
-              wrapper.appendChild(
-                label
-              );
-            }
-          },
-          {
-            once:true
-          }
-        );
-      }
-    );
-  }
-
-  function setupNavigation() {
-    const menuToggle =
-      $("#menuToggle");
-
-    const mobileNav =
-      $("#mobileNav");
-
-    if (
-      menuToggle &&
-      mobileNav
-    ) {
-      menuToggle.addEventListener(
-        "click",
-        () => {
-          const open =
-            mobileNav.classList.toggle(
-              "open"
-            );
-
-          menuToggle.classList.toggle(
-            "menu-open",
-            open
-          );
-
-          menuToggle.setAttribute(
-            "aria-expanded",
-            String(open)
-          );
-
-          menuToggle.setAttribute(
-            "aria-label",
-            open
-              ? "Close menu"
-              : "Open menu"
-          );
-
-          document.body.classList.toggle(
-            "menu-active",
-            open
-          );
-        }
-      );
-    }
-
-    $$(".mobile-nav a").forEach(
-      (link) => {
-        link.addEventListener(
-          "click",
-          () => {
-            mobileNav?.classList.remove(
-              "open"
-            );
-
-            menuToggle?.classList.remove(
-              "menu-open"
-            );
-
-            menuToggle?.setAttribute(
-              "aria-expanded",
-              "false"
-            );
-
-            menuToggle?.setAttribute(
-              "aria-label",
-              "Open menu"
-            );
-
-            document.body.classList.remove(
-              "menu-active"
-            );
-          }
-        );
-      }
-    );
-  }
-
-  function setupSearch() {
-    const toggle =
-      $("#searchToggle");
-
-    const panel =
-      $("#searchPanel");
-
-    const input =
-      $("#searchInput");
-
-    const form =
-      $("#searchForm");
-
-    if (
-      !toggle ||
-      !panel
-    ) {
-      return;
-    }
-
-    const closeSearch =
-      () => {
-        panel.classList.remove(
-          "open"
-        );
-
-        panel.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-
-        toggle.setAttribute(
-          "aria-expanded",
-          "false"
-        );
-
-        toggle.setAttribute(
-          "aria-label",
-          "Open search"
-        );
-
-        document.body.classList.remove(
-          "search-active"
-        );
-      };
-
-    const openSearch =
-      () => {
-        panel.classList.add(
-          "open"
-        );
-
-        panel.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-
-        toggle.setAttribute(
-          "aria-expanded",
-          "true"
-        );
-
-        toggle.setAttribute(
-          "aria-label",
-          "Close search"
-        );
-
-        document.body.classList.add(
-          "search-active"
-        );
-
-        window.setTimeout(
-          () => input?.focus(),
-          120
-        );
-      };
-
-    toggle.addEventListener(
-      "click",
-      () => {
-        const open =
-          panel.classList.contains(
-            "open"
-          );
-
-        if (open) {
-          closeSearch();
-        } else {
-          openSearch();
-        }
-      }
-    );
-
-    form?.addEventListener(
-      "submit",
-      (event) => {
-        event.preventDefault();
-
-        const query =
-          String(
-            input?.value || ""
-          ).trim();
-
-        if (!query) {
-          input?.focus();
-          return;
-        }
-
-        const url =
-          new URL(
-            location.href
-          );
-
-        url.searchParams.set(
-          "q",
-          query
-        );
-
-        closeSearch();
-
-        if (
-          location.pathname.includes(
-            "/articles/"
-          )
-        ) {
-          location.href =
-            `${siteRootPrefix()}index.html?q=${encodeURIComponent(query)}#latest`;
-
-          return;
-        }
-
-        history.replaceState(
-          null,
-          "",
-          url
-        );
-
-        applySearch(
-          query
-        );
-
-        document
-          .getElementById(
-            "latest"
-          )
-          ?.scrollIntoView({
-            behavior:
-              reducedMotion
-                ? "auto"
-                : "smooth"
-          });
-      }
-    );
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (
-          event.key === "Escape"
-        ) {
-          closeSearch();
-
-          const mobileNav =
-            $("#mobileNav");
-
-          const menuToggle =
-            $("#menuToggle");
-
-          mobileNav?.classList.remove(
-            "open"
-          );
-
-          menuToggle?.classList.remove(
-            "menu-open"
-          );
-
-          menuToggle?.setAttribute(
-            "aria-expanded",
-            "false"
-          );
-
-          document.body.classList.remove(
-            "menu-active"
-          );
-        }
-
-        if (
-          (event.metaKey ||
-            event.ctrlKey) &&
-          event.key.toLowerCase() ===
-            "k"
-        ) {
-          event.preventDefault();
-          openSearch();
-        }
-      }
-    );
-
-    const params =
-      new URLSearchParams(
-        location.search
-      );
-
-    const query =
-      params.get("q");
-
-    if (
-      query &&
-      input
-    ) {
-      input.value =
-        query;
-
-      window.setTimeout(
-        () => {
-          if (
-            state.loaded
-          ) {
-            applySearch(
-              query
-            );
-          }
-        },
-        50
-      );
-    }
-  }
-
-  function applySearch(
-    query
-  ) {
-    const normalized =
-      String(query || "")
-        .trim()
-        .toLowerCase();
-
-    state.searchQuery =
-      normalized;
-
-    if (!normalized) {
-      state.filtered =
-        state.articles;
-
-      renderLatest(
-        state.articles
-      );
-
-      updateFeedStatus(
-        `${state.articles.length} published stories`,
-        "live"
-      );
-
-      return;
-    }
-
-    const tokens =
-      normalized
-        .split(/\s+/)
-        .filter(Boolean);
-
-    const results =
-      state.articles.filter(
-        (article) => {
-          const haystack =
-            [
-              article.title,
-              article.desc,
-              article.category,
-              article.tag,
-              article.author
-            ]
-              .join(" ")
-              .toLowerCase();
-
-          return tokens.every(
-            (token) =>
-              haystack.includes(token)
-          );
-        }
-      );
-
-    state.filtered =
-      results;
-
-    const grid =
-      $("#latestGrid");
-
-    if (grid) {
-      if (!results.length) {
-        grid.innerHTML = `
-          <div class="feed-empty">
-            <strong>
-              No results for "${escapeHtml(query)}".
-            </strong>
-
-            <span>
-              Try a different keyword or browse the latest stories.
-            </span>
-          </div>
-        `;
-      } else {
-        grid.innerHTML =
-          results
-            .slice(0, 12)
-            .map(
-              (article, index) =>
-                renderStoryCard(
-                  article,
-                  index
-                )
-            )
-            .join("");
-
-        observeReveals(
-          grid
-        );
-      }
-    }
-
-    updateFeedStatus(
-      `${results.length} ${results.length === 1 ? "result" : "results"} for "${query}"`,
-      results.length
-        ? "live"
-        : "error"
-    );
-  }
-
-  function setupScroll() {
-    const progress =
-      $("#progressBar");
-
-    const header =
-      $("#siteHeader");
-
-    const update =
-      () => {
-        const max =
-          document.documentElement
-            .scrollHeight -
-          window.innerHeight;
-
-        if (progress) {
-          progress.style.width =
-            `${max > 0
-              ? Math.min(
-                  100,
-                  Math.max(
-                    0,
-                    (window.scrollY /
-                      max) *
-                      100
-                  )
-                )
-              : 0}%`;
-        }
-
-        header?.classList.toggle(
-          "scrolled",
-          window.scrollY > 12
-        );
-      };
-
-    window.addEventListener(
-      "scroll",
-      update,
-      {
-        passive:true
-      }
-    );
-
-    update();
-  }
-
-  function setupNewsletter() {
-    const form =
-      $("#newsletterForm");
-
-    if (!form) {
-      return;
-    }
-
-    form.addEventListener(
-      "submit",
-      (event) => {
-        event.preventDefault();
-
-        const email =
-          $("#newsletterEmail");
-
-        const message =
-          $("#newsletterMessage");
-
-        if (
-          !email ||
-          !email.validity.valid
-        ) {
-          email?.focus();
-          return;
-        }
-
-        email.value =
-          "";
-
-        if (message) {
-          message.textContent =
-            "You're on the list. Welcome to TrendRader.";
-        }
-      }
-    );
-  }
-
-  function setupCursor() {
-    const glow =
-      $(".cursor-glow");
-
-    if (
-      !glow ||
-      reducedMotion ||
-      !window.matchMedia(
-        "(hover:hover)"
-      ).matches
-    ) {
-      return;
-    }
-
-    let visible =
-      false;
-
-    window.addEventListener(
-      "pointermove",
-      (event) => {
-        glow.style.left =
-          `${event.clientX}px`;
-
-        glow.style.top =
-          `${event.clientY}px`;
-
-        if (!visible) {
-          visible = true;
-          glow.style.opacity =
-            "1";
-        }
-      },
-      {
-        passive:true
-      }
-    );
-
-    window.addEventListener(
-      "pointerleave",
-      () => {
-        glow.style.opacity =
-          "0";
-        visible = false;
-      }
-    );
-  }
-
-  function observeReveals(
-    root = document
-  ) {
-    const elements =
-      $$(".reveal", root);
-
-    if (!elements.length) {
-      return;
-    }
-
-    if (
-      reducedMotion ||
-      !("IntersectionObserver" in window)
-    ) {
-      elements.forEach(
-        (element) =>
-          element.classList.add(
-            "visible"
-          )
-      );
-
-      return;
-    }
-
-    const observer =
-      new IntersectionObserver(
-        (entries) => {
-          entries.forEach(
-            (entry) => {
-              if (
-                entry.isIntersecting
-              ) {
-                entry.target.classList.add(
-                  "visible"
-                );
-
-                observer.unobserve(
-                  entry.target
-                );
-              }
-            }
-          );
-        },
-        {
-          threshold:.08,
-          rootMargin:
-            "0px 0px -35px"
-        }
-      );
-
-    elements.forEach(
-      (element, index) => {
-        element.style.transitionDelay =
-          `${Math.min(
-            index * 35,
-            210
-          )}ms`;
-
-        observer.observe(
-          element
-        );
-      }
-    );
-  }
-
-  function isArticlePage() {
-    return Boolean(
-      $("#articleBody") ||
-      $(".article-title")
-    );
-  }
-
   function getServerRenderedArticle(
     slug = ""
   ) {
     const title =
       String(
-        $(".article-title")
-          ?.textContent ||
-          ""
+        $(".article-title")?.textContent ||
+        ""
       ).trim();
 
     const description =
       String(
-        $(".article-dek")
-          ?.textContent ||
-          ""
+        $(".article-dek")?.textContent ||
+        ""
       ).trim();
 
     const image =
       String(
-        $("#heroImage")
-          ?.getAttribute("src") ||
-          ""
+        $("#heroImage")?.getAttribute("src") ||
+        ""
       ).trim();
 
     const imageAlt =
       String(
-        $("#heroImage")
-          ?.getAttribute("alt") ||
-          title
+        $("#heroImage")?.getAttribute("alt") ||
+        title
       ).trim();
 
     const category =
       String(
-        $(".article-kicker > span:last-child")
-          ?.textContent ||
-          "News"
+        $(".article-kicker > span:last-child")?.textContent ||
+        "News"
       ).trim();
 
     const tag =
       String(
-        $(".kicker-label")
-          ?.textContent ||
-          "News Report"
+        $(".kicker-label")?.textContent ||
+        "News Report"
       ).trim();
 
     const author =
       String(
-        $(".author strong")
-          ?.textContent ||
-          "TrendRader Editorial"
+        $(".author strong")?.textContent ||
+        "TrendRader Editorial"
       ).trim();
 
     const canonical =
       String(
-        $('link[rel="canonical"]')
-          ?.getAttribute("href") ||
-          ""
+        $('link[rel="canonical"]')?.getAttribute("href") ||
+        ""
       ).trim();
 
     const canonicalSlug =
@@ -2193,8 +2174,7 @@
 
         if (
           parsed &&
-          typeof parsed ===
-            "object" &&
+          typeof parsed === "object" &&
           parsed.title
         ) {
           runtimeArticle =
@@ -2202,9 +2182,7 @@
               parsed
             );
 
-          if (
-            runtimeArticle
-          ) {
+          if (runtimeArticle) {
             runtimeArticle.slug =
               runtimeArticle.slug ||
               slug;
@@ -2231,8 +2209,7 @@
     }
 
     let articles = [];
-    let databaseError =
-      null;
+    let databaseError = null;
 
     try {
       const payload =
@@ -2243,15 +2220,11 @@
       const raw =
         Array.isArray(payload)
           ? payload
-          : Array.isArray(
-              payload.articles
-            )
-              ? payload.articles
-              : Array.isArray(
-                  payload.items
-                )
-                ? payload.items
-                : [];
+          : Array.isArray(payload.articles)
+            ? payload.articles
+            : Array.isArray(payload.items)
+              ? payload.items
+              : [];
 
       articles =
         sortArticles(
@@ -2259,6 +2232,7 @@
             .map(normalizeArticle)
             .filter(isPublished)
         );
+
     } catch (error) {
       databaseError =
         error;
@@ -2269,8 +2243,7 @@
       );
     }
 
-    let article =
-      null;
+    let article = null;
 
     if (
       slug &&
@@ -2290,8 +2263,7 @@
               .endsWith(
                 `${slug}.html`
               )
-        ) ||
-        null;
+        ) || null;
     }
 
     if (
@@ -2331,8 +2303,7 @@
       );
     }
 
-    let bodyHtml =
-      "";
+    let bodyHtml = "";
 
     const existingBody =
       $("#articleBody");
@@ -2372,6 +2343,7 @@
           article.content ||
           article.body
         );
+
     } else if (
       existingBodyIsReal
     ) {
@@ -2379,14 +2351,13 @@
         safeBodyHtml(
           existingBodyHtml
         );
+
     } else if (
       article.delta
     ) {
       try {
         const deltaPath =
-          article.delta.startsWith(
-            "http"
-          )
+          article.delta.startsWith("http")
             ? article.delta
             : new URL(
                 `${siteRootPrefix()}${article.delta.replace(/^\.\//, "")}`,
@@ -2402,6 +2373,7 @@
           quillDeltaToHtml(
             delta
           );
+
       } catch (error) {
         console.warn(
           "TrendRader article delta could not be loaded.",
@@ -2421,8 +2393,7 @@
           : serverArticle
             ? "server"
             : "feed",
-      databaseError,
-      hasPublishedMarkup
+      databaseError
     };
   }
 
@@ -2491,8 +2462,7 @@
 
     setMeta(
       'meta[property="og:title"]',
-      article.seoTitle ||
-        title
+      article.seoTitle || title
     );
 
     setMeta(
@@ -2512,8 +2482,7 @@
 
     setMeta(
       'meta[name="twitter:title"]',
-      article.seoTitle ||
-        title
+      article.seoTitle || title
     );
 
     setMeta(
@@ -2693,16 +2662,15 @@
       keywords.length
     ) {
       tagsEl.innerHTML =
-        `
-          <span>Topics</span>
-          ${keywords
+        `<span>Topics</span>${
+          keywords
             .slice(0,8)
             .map(
               (keyword) =>
-                `<a href="${siteRootPrefix()}index.html#latest">${escapeHtml(keyword)}</a>`
+                `<a href="../index.html#latest">${escapeHtml(keyword)}</a>`
             )
-            .join("")}
-        `;
+            .join("")
+        }`;
     }
 
     buildOutline();
@@ -2764,14 +2732,8 @@
 
             return `
               <a href="#${escapeHtml(heading.id)}">
-                <span>
-                  ${String(
-                    index + 1
-                  ).padStart(2,"0")}
-                </span>
-                ${escapeHtml(
-                  heading.textContent
-                )}
+                <span>${String(index + 1).padStart(2,"0")}</span>
+                ${escapeHtml(heading.textContent)}
               </a>
             `;
           }
@@ -2799,18 +2761,22 @@
       articles.filter(
         (article) =>
           article.slug !==
-            current.slug &&
+          current.slug &&
           article.title
       );
 
     const currentTokens =
       new Set(
-        `${current.title} ${current.desc} ${current.category} ${current.tag}`
+        `
+          ${current.title}
+          ${current.desc}
+          ${current.category}
+          ${current.tag}
+        `
           .toLowerCase()
           .match(
             /[a-z0-9]{4,}/g
-          ) ||
-          []
+          ) || []
       );
 
     const related =
@@ -2818,12 +2784,16 @@
         .map(
           (article) => {
             const tokens =
-              `${article.title} ${article.desc} ${article.category} ${article.tag}`
+              `
+                ${article.title}
+                ${article.desc}
+                ${article.category}
+                ${article.tag}
+              `
                 .toLowerCase()
                 .match(
                   /[a-z0-9]{4,}/g
-                ) ||
-                [];
+                ) || [];
 
             const overlap =
               tokens.reduce(
@@ -2843,10 +2813,8 @@
               );
 
             const sameCategory =
-              article.category
-                .toLowerCase() ===
-              current.category
-                .toLowerCase()
+              article.category.toLowerCase() ===
+              current.category.toLowerCase()
                 ? 4
                 : 0;
 
@@ -2865,9 +2833,9 @@
             new Date(
               b.article.date
             ) -
-              new Date(
-                a.article.date
-              )
+            new Date(
+              a.article.date
+            )
         )
         .slice(0,3)
         .map(
@@ -2878,7 +2846,7 @@
     grid.innerHTML =
       related
         .map(
-          (article,index) => {
+          (article, index) => {
             const image =
               article.image
                 ? `
@@ -2901,22 +2869,14 @@
                 <div class="related-image">
                   ${image}
                   <span>
-                    ${String(
-                      index + 1
-                    ).padStart(2,"0")}
+                    ${String(index + 1).padStart(2,"0")}
                   </span>
                 </div>
 
                 <div class="related-meta">
-                  <span>
-                    ${escapeHtml(article.tag)}
-                  </span>
-
+                  <span>${escapeHtml(article.tag)}</span>
                   <i></i>
-
-                  <span>
-                    ${readTime(article)} min
-                  </span>
+                  <span>${readTime(article)} min</span>
                 </div>
 
                 <h3>
@@ -2924,7 +2884,7 @@
                 </h3>
 
                 <div class="related-arrow">
-                  ${iconArrow()}
+                  ${externalArrowSvg()}
                 </div>
 
               </a>
@@ -2933,11 +2893,13 @@
         )
         .join("");
 
-    observeReveals(
+    attachImageFallbacks(
       grid
     );
 
-    setupImageFallbacks();
+    observeReveals(
+      grid
+    );
   }
 
   function updateSchemaFallback(
@@ -2954,8 +2916,7 @@
       existing.some(
         (node) =>
           /\{\{/.test(
-            node.textContent ||
-            ""
+            node.textContent || ""
           )
       );
 
@@ -2969,81 +2930,52 @@
     );
 
     const schema = {
-      "@context":
-        "https://schema.org",
-
-      "@type":
-        "NewsArticle",
-
-      "headline":
-        article.title,
-
-      "description":
-        article.desc,
-
-      "url":
-        canonical,
-
-      "datePublished":
-        article.date,
-
+      "@context":"https://schema.org",
+      "@type":"NewsArticle",
+      "headline":article.title,
+      "description":article.desc,
+      "url":canonical,
+      "datePublished":article.date,
       "dateModified":
         article.modified ||
         article.date,
-
       "author":{
-        "@type":
-          "Organization",
+        "@type":"Organization",
         "name":
           article.author ||
           "TrendRader Editorial"
       },
-
       "publisher":{
-        "@type":
-          "Organization",
-        "name":
-          "TrendRader",
-        "url":
-          BASE_SITE,
+        "@type":"Organization",
+        "name":"TrendRader",
+        "url":BASE_SITE,
         "logo":{
-          "@type":
-            "ImageObject",
+          "@type":"ImageObject",
           "url":
             `${BASE_SITE}/assets/logo.svg`
         }
       },
-
       "image":
         article.image
           ? [article.image]
           : [],
-
       "articleSection":
         article.category,
-
       "keywords":
         Array.isArray(
           article.keywords
         )
-          ? article.keywords.join(
-              ", "
-            )
+          ? article.keywords.join(", ")
           : String(
               article.keywords ||
               ""
             ),
-
       "mainEntityOfPage":{
-        "@type":
-          "WebPage",
-        "@id":
-          canonical
+        "@type":"WebPage",
+        "@id":canonical
       },
-
       "isAccessibleForFree":
         true,
-
       "timeRequired":
         `PT${read}M`
     };
@@ -3066,455 +2998,165 @@
     );
   }
 
-  async function initHomepage() {
-    try {
-      updateFeedStatus(
-        "Loading published stories...",
-        "loading"
-      );
 
-      const payload =
-        await fetchJson(
-          articleDatabaseUrl()
-        );
+  /* =========================================================
+     PAGE DETECTION
+     ========================================================= */
 
-      const raw =
-        Array.isArray(payload)
-          ? payload
-          : Array.isArray(
-              payload.articles
-            )
-              ? payload.articles
-              : Array.isArray(
-                  payload.items
-                )
-                ? payload.items
-                : [];
-
-      renderHomepage(
-        raw
-      );
-    } catch (error) {
-      console.error(
-        "TrendRader homepage feed failed:",
-        error
-      );
-
-      updateFeedStatus(
-        "Feed temporarily unavailable",
-        "error"
-      );
-
-      const empty =
-        $("#emptyState");
-
-      if (empty) {
-        empty.hidden =
-          false;
-
-        const heading =
-          empty.querySelector(
-            "h2"
-          );
-
-        const paragraph =
-          empty.querySelector(
-            "p"
-          );
-
-        if (heading) {
-          heading.textContent =
-            "The news desk is reconnecting.";
-        }
-
-        if (paragraph) {
-          paragraph.textContent =
-            "Published stories could not be loaded right now. The page will remain available while the editorial feed recovers.";
-        }
-      }
-
-      [
-        "#latestGrid",
-        "#politicsGrid",
-        "#technologyGrid",
-        "#businessGrid",
-        "#entertainmentGrid",
-        "#sportsGrid",
-        "#trendingGrid"
-      ].forEach(
-        (selector) => {
-          const grid =
-            $(selector);
-
-          if (grid) {
-            renderEmptyGrid(
-              grid,
-              "Stories temporarily unavailable."
-            );
-          }
-        }
-      );
-    }
-  }
-
-  async function initArticle() {
-    try {
-      const resolved =
-        await resolveArticle();
-
-      if (resolved) {
-        try {
-          hydrateArticlePage(
-            resolved
-          );
-        } catch (error) {
-          console.error(
-            "TrendRader article hydration failed:",
-            error
-          );
-
-          const body =
-            $("#articleBody");
-
-          const hasRealBody =
-            Boolean(
-              body &&
-              body.innerHTML
-                .replace(
-                  /<[^>]*>/g,
-                  " "
-                )
-                .replace(
-                  /&nbsp;/g,
-                  " "
-                )
-                .trim()
-                .length > 20
-            );
-
-          if (!hasRealBody) {
-            setMeta(
-              'meta[name="robots"]',
-              "noindex, follow"
-            );
-
-            if (body) {
-              body.innerHTML =
-                `
-                  <div class="article-load-error">
-                    <p>
-                      This article is temporarily unavailable.
-                    </p>
-                    <a href="${siteRootPrefix()}index.html">
-                      Return to TrendRader
-                    </a>
-                  </div>
-                `;
-            }
-          }
-        }
-      }
-    } catch (error) {
-      console.error(
-        "TrendRader article load failed:",
-        error
-      );
-
-      const body =
-        $("#articleBody");
-
-      const hasRealBody =
-        Boolean(
-          body &&
-          body.innerHTML
-            .replace(
-              /<[^>]*>/g,
-              " "
-            )
-            .replace(
-              /&nbsp;/g,
-              " "
-            )
-            .trim()
-            .length > 20
-        );
-
-      if (!hasRealBody) {
-        document.title =
-          "TrendRader — Article";
-
-        setMeta(
-          'meta[name="robots"]',
-          "noindex, follow"
-        );
-
-        if (body) {
-          body.innerHTML =
-            `
-              <div class="article-load-error">
-                <p>
-                  This article is temporarily unavailable.
-                </p>
-
-                <a href="${siteRootPrefix()}index.html">
-                  Return to TrendRader
-                </a>
-              </div>
-            `;
-        }
-      }
-    }
-  }
-
-  function setupArticleUtilities() {
-    setupShare();
-    setupLightbox();
-  }
-
-  function setupShare() {
-    const modal =
-      $("#shareModal");
-
-    if (!modal) {
-      return;
-    }
-
-    const open =
-      () => {
-        modal.classList.add(
-          "open"
-        );
-
-        modal.setAttribute(
-          "aria-hidden",
-          "false"
-        );
-      };
-
-    const close =
-      () => {
-        modal.classList.remove(
-          "open"
-        );
-
-        modal.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-      };
-
-    $("#shareTop")
-      ?.addEventListener(
-        "click",
-        open
-      );
-
-    $("#shareRail")
-      ?.addEventListener(
-        "click",
-        open
-      );
-
-    $("#closeShare")
-      ?.addEventListener(
-        "click",
-        close
-      );
-
-    $("#shareBackdrop")
-      ?.addEventListener(
-        "click",
-        close
-      );
-
-    $$("[data-share]")
-      .forEach(
-        (button) => {
-          button.addEventListener(
-            "click",
-            async () => {
-              const type =
-                button.dataset.share;
-
-              const url =
-                location.href;
-
-              const title =
-                document.title;
-
-              if (
-                type ===
-                "copy"
-              ) {
-                try {
-                  await navigator
-                    .clipboard
-                    .writeText(
-                      url
-                    );
-
-                  const message =
-                    $("#shareMessage");
-
-                  if (message) {
-                    message.textContent =
-                      "Link copied to clipboard.";
-                  }
-                } catch {
-                  const message =
-                    $("#shareMessage");
-
-                  if (message) {
-                    message.textContent =
-                      url;
-                  }
-                }
-
-                return;
-              }
-
-              const target =
-                type === "x"
-                  ? `https://twitter.com/intent/tweet?text=${encodeURIComponent(title)}&url=${encodeURIComponent(url)}`
-                  : `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(url)}`;
-
-              window.open(
-                target,
-                "share",
-                "width=700,height=600,noopener,noreferrer"
-              );
-            }
-          );
-        }
-      );
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          close();
-        }
-      }
+  function isHomePage() {
+    return Boolean(
+      $("#latestGrid") &&
+      $("#leadStoryMount")
     );
   }
 
-  function setupLightbox() {
-    const lightbox =
-      $("#lightbox");
-
-    const image =
-      $("#heroImage");
-
-    if (
-      !lightbox ||
-      !image
-    ) {
-      return;
-    }
-
-    $("#expandImage")
-      ?.addEventListener(
-        "click",
-        () => {
-          if (!image.src) {
-            return;
-          }
-
-          const target =
-            $("#lightboxImage");
-
-          if (target) {
-            target.src =
-              image.src;
-
-            target.alt =
-              image.alt;
-          }
-
-          lightbox.classList.add(
-            "open"
-          );
-
-          lightbox.setAttribute(
-            "aria-hidden",
-            "false"
-          );
-        }
-      );
-
-    const close =
-      () => {
-        lightbox.classList.remove(
-          "open"
-        );
-
-        lightbox.setAttribute(
-          "aria-hidden",
-          "true"
-        );
-      };
-
-    $("#closeLightbox")
-      ?.addEventListener(
-        "click",
-        close
-      );
-
-    lightbox.addEventListener(
-      "click",
-      (event) => {
-        if (
-          event.target ===
-          lightbox
-        ) {
-          close();
-        }
-      }
-    );
-
-    document.addEventListener(
-      "keydown",
-      (event) => {
-        if (
-          event.key ===
-          "Escape"
-        ) {
-          close();
-        }
-      }
+  function isArticlePage() {
+    return Boolean(
+      $("#articleBody") ||
+      $(".article-title") ||
+      $("#articleRuntimeData")
     );
   }
+
+
+  /* =========================================================
+     INIT
+     ========================================================= */
 
   async function init() {
+
     setupNavigation();
     setupSearch();
     setupScroll();
     setupNewsletter();
     setupCursor();
-    setupArticleUtilities();
 
     const footerYear =
       $("#footerYear");
 
     if (footerYear) {
       footerYear.textContent =
-        String(
-          new Date().getFullYear()
-        );
+        new Date()
+          .getFullYear();
+    }
+
+    if (isHomePage()) {
+      await initHomePage();
     }
 
     if (isArticlePage()) {
-      await initArticle();
-    } else {
-      await initHomepage();
+      try {
+        const resolved =
+          await resolveArticle();
+
+        if (resolved) {
+          try {
+            hydrateArticlePage(
+              resolved
+            );
+          } catch (error) {
+            console.error(
+              "TrendRader article hydration failed:",
+              error
+            );
+
+            const body =
+              $("#articleBody");
+
+            const hasRealBody =
+              Boolean(
+                body &&
+                body.innerHTML
+                  .replace(
+                    /<[^>]*>/g,
+                    " "
+                  )
+                  .replace(
+                    /&nbsp;/g,
+                    " "
+                  )
+                  .trim()
+                  .length > 20
+              );
+
+            if (!hasRealBody) {
+              setMeta(
+                'meta[name="robots"]',
+                "noindex, follow"
+              );
+
+              if (body) {
+                body.innerHTML = `
+                  <div class="article-load-error">
+                    <p>
+                      This article is temporarily unavailable.
+                    </p>
+
+                    <a href="../index.html">
+                      Return to TrendRader
+                    </a>
+                  </div>
+                `;
+              }
+            }
+          }
+        }
+
+      } catch (error) {
+
+        console.error(
+          "TrendRader article load failed:",
+          error
+        );
+
+        const body =
+          $("#articleBody");
+
+        const hasRealBody =
+          Boolean(
+            body &&
+            body.innerHTML
+              .replace(
+                /<[^>]*>/g,
+                " "
+              )
+              .replace(
+                /&nbsp;/g,
+                " "
+              )
+              .trim()
+              .length > 20
+          );
+
+        if (!hasRealBody) {
+          document.title =
+            "TrendRader — Article";
+
+          setMeta(
+            'meta[name="robots"]',
+            "noindex, follow"
+          );
+
+          if (body) {
+            body.innerHTML = `
+              <div class="article-load-error">
+                <p>
+                  This article is temporarily unavailable.
+                </p>
+
+                <a href="../index.html">
+                  Return to TrendRader
+                </a>
+              </div>
+            `;
+          }
+        }
+      }
     }
 
     observeReveals();
-    setupImageFallbacks();
   }
 
   init();
+
 })();
