@@ -213,3 +213,36 @@ img{display:block;width:100%;height:auto}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .reveal{opacity:1;transform:none}
 }
+
+
+/* ============================================================
+   TRENRADER PUBLIC FRONTEND 2.0 - MOBILE FIRST HARDENING
+   ============================================================ */
+.reveal{opacity:1!important;transform:none!important}
+.lead-image-inner{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;background:#ddd9d1}
+.lead-image-inner img{width:100%!important;height:100%!important;object-fit:cover}
+.feed-empty{grid-column:1/-1;padding:24px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}.feed-empty strong{font-family:var(--serif);font-size:22px;font-weight:500}.feed-empty span{font-size:11px;color:var(--muted)}
+@media(max-width:699px){
+  body{font-size:16px}
+  .header-inner{height:64px;width:calc(100% - 24px)}
+  .brand-name{font-size:11px;letter-spacing:.14em}
+  .hero{padding:32px 0 44px;gap:24px}
+  .hero-copy h1{font-size:clamp(43px,13vw,64px);line-height:.94}
+  .hero-intro{font-size:13px;line-height:1.65}
+  .lead-story{gap:0}
+  .lead-image{aspect-ratio:4/3}
+  .lead-content h2{font-size:clamp(30px,9.5vw,44px);line-height:1.01}
+  .section-block,.category-section{padding:42px 0}
+  .section-heading{align-items:flex-end;margin-bottom:17px}
+  .section-heading h2{font-size:30px}
+  .story-grid,.category-grid{gap:28px}
+  .story-card h3,.category-card h3{font-size:23px;line-height:1.08}
+  .story-card p,.category-card p{font-size:11.5px;line-height:1.58}
+  .dark-feature{padding:44px 0}
+  .dark-copy h2{font-size:clamp(36px,11vw,58px)}
+  .newsletter{margin-top:34px;padding:30px 18px}
+  .newsletter h2{font-size:38px}
+  .footer-top{padding:28px 0;flex-direction:column;gap:20px}.footer-index{text-align:left}
+  .footer-bottom{flex-direction:column;gap:12px;padding-bottom:26px}.footer-bottom div{gap:16px}
+}
+@media(min-width:700px){.lead-image-inner{position:absolute!important}}

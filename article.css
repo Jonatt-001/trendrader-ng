@@ -220,3 +220,42 @@ img{display:block;max-width:100%}
   *,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}
   .reveal{opacity:1;transform:none}
 }
+
+
+/* ============================================================
+   TRENRADER ARTICLE READING SYSTEM 2.0
+   Mobile-first editorial typography and resilient visibility.
+   ============================================================ */
+.reveal{opacity:1!important;transform:none!important}
+.article-header{max-width:900px;margin-inline:auto}
+.article-title{font-family:var(--serif);font-weight:500;text-wrap:balance}
+.article-dek{font-family:var(--sans);max-width:760px}
+.article-body{font-family:var(--serif);font-size:20px;line-height:1.78;letter-spacing:-.008em;color:#252522}
+.article-body p{margin-bottom:1.45em}
+.article-body .lead{font-size:1.12em;line-height:1.55;font-weight:500}
+.article-body h2{font-family:var(--sans);font-size:clamp(25px,7vw,36px);line-height:1.1;letter-spacing:-.035em;margin:2.2em 0 .65em}
+.article-body h3{font-family:var(--sans);font-size:clamp(20px,5.5vw,25px);line-height:1.18;margin:1.8em 0 .55em}
+.article-body blockquote{font-family:var(--serif);font-size:clamp(24px,7vw,31px);line-height:1.35;margin:1.8em 0;padding:5px 0 5px 20px}
+.article-body li{line-height:1.65;margin-bottom:.55em}
+.article-body a{text-decoration-thickness:1px;text-underline-offset:3px}
+.article-body img{border-radius:2px}
+.hero-image-wrap{background:#e3e0d8}
+.hero-media figcaption{font-family:var(--sans);font-size:9px}
+.author-copy p{font-size:12px;line-height:1.6}
+.related-card h3{font-size:22px;line-height:1.12}
+.article-load-error{padding:28px 0;border-top:1px solid var(--line);border-bottom:1px solid var(--line);font-family:var(--sans);font-size:14px}.article-load-error a{display:inline-block;margin-top:12px;font-weight:700;color:var(--accent)}
+@media(max-width:699px){
+  .section-wrap{width:min(100% - 24px,var(--content))}
+  .header-inner{height:64px;width:calc(100% - 24px)}
+  .article-header{padding:36px 0 25px}
+  .article-kicker{font-size:8px;flex-wrap:wrap}
+  .article-title{font-size:clamp(39px,12.5vw,58px);line-height:.98;letter-spacing:-.035em;margin-top:14px}
+  .article-dek{font-size:15px;line-height:1.6;margin-top:16px}
+  .article-meta{gap:11px;margin-top:19px}.meta-divider{height:24px}.author strong{font-size:10px}.meta-item strong{font-size:9px}
+  .hero-media{margin-bottom:36px}.hero-image-wrap{aspect-ratio:4/3}.hero-media figcaption{padding-top:7px}
+  .article-body{font-size:20px;line-height:1.78;max-width:100%}
+  .article-body p{margin-bottom:1.35em}
+  .article-body .lead{font-size:22px;line-height:1.5}
+  .article-body blockquote{padding-left:17px}
+  .author-card{margin-top:42px;padding:24px 0}.related{padding:45px 0}.newsletter{padding:30px 18px}.footer-top{flex-direction:column;gap:20px}.footer-index{text-align:left}.footer-bottom{flex-direction:column;gap:12px}
+}

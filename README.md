@@ -1,50 +1,46 @@
 # TrendRader
 
-Production-oriented static news publishing starter for **https://trendrader.space/**.
+TrendRader is a static-first digital news publication for Nigeria and the world.
 
-## Structure
+## Editorial architecture
 
-- `index.html` — publisher-owned homepage. The editor does not rewrite the homepage design.
-- `article.html` — publisher-owned article template. The editor injects content and SEO metadata into this template when publishing.
-- `style.css` / `article.css` — presentation layer.
-- `script.js` / `article.js` — progressive enhancement only.
-- `admin/index.html` — editorial dashboard and publishing workflow.
-- `admin/published.html` — published article index.
-- `admin/draft.html` — local draft queue.
-- `admin/settings.html` — GitHub repository, site URL, media and AI configuration.
-- `assets/articles.json` — canonical publication database.
-- `assets/categories.json` — TrendRader taxonomy.
-- `sitemap.xml` / `rss.xml` / `robots.txt` — crawl/discovery surfaces.
-- `sw.js` — network-first service worker with an offline shell fallback.
+The editor owns content and publishing data. It does not redesign the public homepage or article presentation.
 
-## Publishing model
+Publication flow:
 
-The editor uses GitHub's Contents/Git Data APIs from the browser. Configure:
+1. Write headline and story.
+2. Add publication details and real featured image.
+3. Review SEO and editorial readiness.
+4. Run Smart Internal Links when contextual opportunities exist.
+5. Publish & Build.
+6. The editor validates the article, creates the standalone article HTML and editor delta, updates `assets/articles.json`, rebuilds category pages, sitemap and RSS, then commits the publication atomically to GitHub.
+7. The public homepage reads only published records from `assets/articles.json`.
 
-1. GitHub personal access token with the minimum repository permissions required to write the publication repository.
-2. Repository in `owner/repository` format.
-3. Branch, normally `main`.
-4. Site URL: `https://trendrader.space`.
+## Progressive editor UX
 
-Publishing writes the canonical article record to `assets/articles.json`, writes the standalone article to `articles/<slug>.html`, preserves an editor delta, updates taxonomy data, and rebuilds discovery files.
+Advanced sections are collapsed by default. Story and core publication details remain immediately available. SEO, AI assistance, review, build and migration tools open only when needed. Publishing automatically opens and scrolls to the Build & Publication section and reports live workflow state.
 
-The homepage and article template are publisher-owned and protected by the editor.
+## Smart internal linking
 
-## SEO architecture
+The internal-link engine does not inject arbitrary keywords. It compares the current story with published TrendRader coverage using title phrases, keywords, taxonomy, semantic overlap and recency. A suggestion is only actionable when a meaningful anchor phrase already exists naturally in the story. The editor explicitly applies each link.
 
-Published article pages include:
+## Public frontend
 
-- `NewsArticle` or `Article` JSON-LD as appropriate to the story format.
-- `Organization`, publisher, author, `datePublished`, `dateModified`, `mainEntityOfPage`, `articleSection`, keywords and image metadata.
-- Canonical URL and index/follow directives.
-- Open Graph and large-image Twitter metadata.
-- RSS discovery.
-- Sitemap entries with last-modified dates and image metadata.
-- Breadcrumb/related-article structures where applicable.
-- Accessible semantic HTML, explicit image dimensions and lazy loading for non-critical images.
+The homepage and article page are mobile-first and consume the same published article database. Unpublished/draft records are excluded. Article pages use canonical TrendRader URLs, editorial typography, accessible semantic markup, responsive images and NewsArticle structured data.
 
-The system is designed around Google Search/News/Discover best practices, but no CMS can guarantee inclusion, a Discover appearance, a specific ranking, or a Lighthouse score independent of hosting, asset weight, server latency and editorial quality.
+## Configuration
 
-## Editorial rule
+Production site URL:
 
-The editor owns content, metadata, taxonomy, publication state and repository data. It does not redesign the homepage or article presentation.
+`https://trendrader.space`
+
+GitHub repository:
+
+`Jonatt-001/trendrader-ng`
+
+Cloudinary:
+
+- Cloud name: `dxdbn6xwy`
+- Upload preset: `geefox_unsigned`
+
+Do not commit private API secrets. Browser uploads use the configured unsigned preset.

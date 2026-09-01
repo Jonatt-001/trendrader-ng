@@ -1,335 +1,215 @@
-const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-const state = { articles: [], filtered: [] };
+(() => {
+  "use strict";
 
-const $ = (selector, root = document) => root.querySelector(selector);
-const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
+  const BASE_SITE = "https://trendrader.space";
+  const DB_PATH = "./assets/articles.json";
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const state = { articles: [], filtered: [] };
+  const $ = (selector, root = document) => root.querySelector(selector);
+  const $$ = (selector, root = document) => Array.from(root.querySelectorAll(selector));
 
-function escapeHtml(value) {
-  return String(value ?? "").replace(/[&<>"']/g, (char) => ({
-    "&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"
-  }[char]));
-}
+  const escapeHtml = (value) => String(value ?? "").replace(/[&<>"']/g, (char) => ({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#39;"}[char]));
+  const normalizePath = (value) => {
+    const raw = String(value || "").trim();
+    if (!raw) return "";
+    if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return raw;
+    return `./${raw.replace(/^\.\//, "")}`;
+  };
+  const articleUrl = (article) => {
+    const explicit = String(article.url || "").trim();
+    if (explicit && explicit !== "#" && !/^index\.html$/i.test(explicit)) return normalizePath(explicit);
+    const slug = String(article.slug || "").trim();
+    return slug ? `./articles/${encodeURIComponent(slug)}.html` : "#";
+  };
+  const title = (a) => String(a?.title || a?.headline || "").trim();
+  const description = (a) => String(a?.desc || a?.description || a?.excerpt || a?.dek || "").trim();
+  const image = (a) => String(a?.image || a?.imageUrl || a?.featuredImage || "").trim();
+  const category = (a) => String(a?.category || a?.meta || "News").trim();
+  const tag = (a) => String(a?.tag || a?.contentType || "News").trim();
+  const author = (a) => String(a?.author || "TrendRader Editorial").trim();
+  const date = (a) => a?.date || a?.publishedAt || a?.datePublished || a?.createdAt || "";
+  const isPublished = (a) => {
+    if (!a || !title(a)) return false;
+    const status = String(a.status || a.state || "").toLowerCase();
+    if (["draft","unpublished","archived","deleted"].includes(status)) return false;
+    if (a.page && String(a.page).toLowerCase() !== "news") return false;
+    return Boolean(a.url || a.slug);
+  };
+  const sortArticles = (items) => [...items].sort((a,b) => new Date(date(b) || 0) - new Date(date(a) || 0));
+  const formatDate = (value) => {
+    const d = new Date(value);
+    return Number.isNaN(d.getTime()) ? "Recently published" : new Intl.DateTimeFormat("en-NG", {day:"numeric",month:"short",year:"numeric"}).format(d);
+  };
+  const relativeDate = (value) => {
+    const d = new Date(value);
+    if (Number.isNaN(d.getTime())) return "Recently";
+    const diff = Math.max(0, Date.now() - d.getTime());
+    const minutes = Math.floor(diff / 60000);
+    if (minutes < 60) return `${Math.max(1, minutes)} min ago`;
+    const hours = Math.floor(minutes / 60);
+    if (hours < 24) return `${hours} hr${hours === 1 ? "" : "s"} ago`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
+    return formatDate(value);
+  };
+  const readTime = (a) => {
+    const n = Number(a?.readTime);
+    return Number.isFinite(n) && n > 0 ? Math.round(n) : 4;
+  };
 
-function normalizePath(value) {
-  const raw = String(value || "").trim();
-  if (!raw) return "";
-  if (/^https?:\/\//i.test(raw) || raw.startsWith("/")) return raw;
-  return `./${raw.replace(/^\.\//, "")}`;
-}
-
-function articleUrl(article) {
-  const explicit = String(article.url || article.page || "").trim();
-  if (explicit && explicit !== "#" && explicit.toLowerCase() !== "index.html") return normalizePath(explicit);
-  const slug = String(article.slug || "").trim();
-  return slug ? `./articles/${encodeURIComponent(slug)}.html` : "./article.html";
-}
-
-function articleTitle(article) {
-  return String(article.title || article.headline || "").trim();
-}
-
-function articleDescription(article) {
-  return String(article.desc || article.description || article.excerpt || article.dek || "").trim();
-}
-
-function articleImage(article) {
-  return String(article.image || article.imageUrl || article.featuredImage || article.featured_image || "").trim();
-}
-
-function articleCategory(article) {
-  return String(article.category || article.meta || "News").trim();
-}
-
-function articleTag(article) {
-  return String(article.tag || article.contentType || "News").trim();
-}
-
-function articleAuthor(article) {
-  return String(article.author || "TrendRader Editorial").trim();
-}
-
-function articleDate(article) {
-  return article.date || article.publishedAt || article.datePublished || article.createdAt || "";
-}
-
-function isPublished(article) {
-  const status = String(article.status || article.state || "").trim().toLowerCase();
-  if (status && ["draft","unpublished","archived","deleted"].includes(status)) return false;
-  const page = String(article.page || "").trim().toLowerCase();
-  if (page && page !== "news") return false;
-  return Boolean(articleTitle(article) && (article.url || article.slug));
-}
-
-function sortArticles(items) {
-  return [...items].sort((a,b) => new Date(articleDate(b) || 0) - new Date(articleDate(a) || 0));
-}
-
-function formatDate(value) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Recently published";
-  return new Intl.DateTimeFormat("en-NG", { day:"numeric", month:"short", year:"numeric" }).format(date);
-}
-
-function relativeDate(value) {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return "Recently";
-  const diff = Date.now() - date.getTime();
-  const minutes = Math.max(0, Math.floor(diff / 60000));
-  if (minutes < 60) return `${Math.max(1, minutes)} min ago`;
-  const hours = Math.floor(minutes / 60);
-  if (hours < 24) return `${hours} hr${hours === 1 ? "" : "s"} ago`;
-  const days = Math.floor(hours / 24);
-  if (days < 7) return `${days} day${days === 1 ? "" : "s"} ago`;
-  return formatDate(value);
-}
-
-function readTime(article) {
-  const value = Number(article.readTime);
-  return Number.isFinite(value) && value > 0 ? Math.round(value) : 4;
-}
-
-function imageMarkup(article, className = "", eager = false) {
-  const image = articleImage(article);
-  if (!image) {
-    return `<div class="${className} image-fallback" aria-label="TrendRader story image unavailable"><span>TrendRader</span></div>`;
+  function imageMarkup(article, className, eager = false) {
+    const src = image(article);
+    if (!src) return `<div class="${className} image-fallback" aria-hidden="true"><span>TrendRader</span></div>`;
+    return `<div class="${className}"><img src="${escapeHtml(src)}" alt="${escapeHtml(article.imageAlt || title(article))}" width="1200" height="675" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async"></div>`;
   }
-  return `<div class="${className}"><img src="${escapeHtml(image)}" alt="${escapeHtml(articleTitle(article))}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} width="1200" height="675"></div>`;
-}
 
-function cardMarkup(article, index) {
-  const title = escapeHtml(articleTitle(article));
-  const desc = escapeHtml(articleDescription(article));
-  const category = escapeHtml(articleCategory(article));
-  const url = escapeHtml(articleUrl(article));
-  return `<article class="story-card reveal">
-    <a href="${url}" aria-label="Read: ${title}">
+  function cardMarkup(article, index) {
+    return `<article class="story-card reveal"><a href="${escapeHtml(articleUrl(article))}" aria-label="Read: ${escapeHtml(title(article))}">
       ${imageMarkup(article, "story-image")}
-      <div class="story-info"><span>${category}</span><i></i><time datetime="${escapeHtml(articleDate(article))}">${escapeHtml(relativeDate(articleDate(article)))}</time></div>
-      <h3>${title}</h3>
-      ${desc ? `<p>${desc}</p>` : ""}
-    </a>
-  </article>`;
-}
+      <div class="story-info"><span>${escapeHtml(category(article))}</span><i></i><time datetime="${escapeHtml(date(article))}">${escapeHtml(relativeDate(date(article)))}</time></div>
+      <h3>${escapeHtml(title(article))}</h3>
+      ${description(article) ? `<p>${escapeHtml(description(article))}</p>` : ""}
+    </a></article>`;
+  }
 
-function categoryCardMarkup(article, index) {
-  const title = escapeHtml(articleTitle(article));
-  const desc = escapeHtml(articleDescription(article));
-  const category = escapeHtml(articleCategory(article));
-  const url = escapeHtml(articleUrl(article));
-  return `<article class="category-card reveal">
-    <a href="${url}" aria-label="Read: ${title}">
+  function categoryCardMarkup(article) {
+    return `<article class="category-card reveal"><a href="${escapeHtml(articleUrl(article))}" aria-label="Read: ${escapeHtml(title(article))}">
       ${imageMarkup(article, "category-image")}
-      <div class="story-info"><span>${category}</span><i></i><time>${escapeHtml(relativeDate(articleDate(article)))}</time></div>
-      <h3>${title}</h3>
-      ${desc ? `<p>${desc}</p>` : ""}
-    </a>
-  </article>`;
-}
-
-function renderLead(article) {
-  const mount = $("#leadStoryMount");
-  if (!mount || !article) return;
-  const title = escapeHtml(articleTitle(article));
-  const desc = escapeHtml(articleDescription(article));
-  const category = escapeHtml(articleCategory(article));
-  const tag = escapeHtml(articleTag(article));
-  const author = escapeHtml(articleAuthor(article));
-  const url = escapeHtml(articleUrl(article));
-  const image = articleImage(article);
-  mount.innerHTML = `<a class="lead-story reveal" href="${url}" aria-label="Read featured story: ${title}">
-    <div class="lead-image">
-      ${image ? `<img src="${escapeHtml(image)}" alt="${title}" fetchpriority="high" width="1600" height="900">` : `<div class="image-fallback" aria-label="TrendRader featured story image unavailable"><span>TrendRader</span></div>`}
-      <div class="image-shade"></div>
-      <div class="lead-index"><span>01</span><i></i><span>${tag}</span></div>
-      <div class="lead-arrow" aria-hidden="true">↗</div>
-    </div>
-    <div class="lead-content">
-      <div class="story-category"><span>${category}</span><i></i><span>FEATURED</span></div>
-      <h2>${title}</h2>
-      ${desc ? `<p>${desc}</p>` : ""}
-      <div class="story-byline"><span>By ${author}</span><span class="byline-line"></span><span>${readTime(article)} min read</span></div>
-    </div>
-  </a>`;
-  observeReveals(mount);
-}
-
-function renderTicker(items) {
-  const ticker = $("#liveTicker");
-  const track = $("#tickerTrack");
-  const live = items.slice(0, 6);
-  if (!ticker || !track || live.length < 2) return;
-  const links = live.map((item) => `<a href="${escapeHtml(articleUrl(item))}">${escapeHtml(articleTitle(item))}</a><i>•</i>`).join("");
-  track.innerHTML = `<div class="ticker-content">${links}</div><div class="ticker-content" aria-hidden="true">${links}</div>`;
-  ticker.hidden = false;
-}
-
-function renderCategory(id, category, limit = 3) {
-  const grid = $(`#${id}`);
-  const section = grid?.closest("[data-category]");
-  if (!grid || !section) return;
-  const matches = state.articles.filter((article) => articleCategory(article).toLowerCase() === category.toLowerCase()).slice(0, limit);
-  if (!matches.length) {
-    section.hidden = true;
-    return;
+      <div class="story-info"><span>${escapeHtml(category(article))}</span><i></i><time datetime="${escapeHtml(date(article))}">${escapeHtml(relativeDate(date(article)))}</time></div>
+      <h3>${escapeHtml(title(article))}</h3>
+      ${description(article) ? `<p>${escapeHtml(description(article))}</p>` : ""}
+    </a></article>`;
   }
-  section.hidden = false;
-  grid.innerHTML = matches.map(categoryCardMarkup).join("");
-  observeReveals(grid);
-}
 
-function renderTechnology() {
-  const grid = $("#technologyGrid");
-  const section = $("#technology");
-  if (!grid || !section) return;
-  const matches = state.articles.filter((article) => articleCategory(article).toLowerCase() === "technology").slice(0, 4);
-  if (!matches.length) { section.hidden = true; return; }
-  section.hidden = false;
-  grid.innerHTML = matches.map((article) => {
-    const title = escapeHtml(articleTitle(article));
-    const url = escapeHtml(articleUrl(article));
-    return `<a class="dark-card reveal" href="${url}">
-      ${imageMarkup(article, "")}
-      <div><div class="story-info"><span>${escapeHtml(articleTag(article))}</span><i></i><time>${escapeHtml(relativeDate(articleDate(article)))}</time></div><h3>${title}</h3></div>
+  function renderLead(article) {
+    const mount = $("#leadStoryMount");
+    if (!mount || !article) return;
+    mount.hidden = false;
+    mount.innerHTML = `<a class="lead-story" href="${escapeHtml(articleUrl(article))}" aria-label="Read featured story: ${escapeHtml(title(article))}">
+      <div class="lead-image">${imageMarkup(article, "lead-image", true).replace('class="lead-image"','class="lead-image-inner"')}<div class="image-shade"></div><div class="lead-index"><span>01</span><i></i><span>${escapeHtml(tag(article))}</span></div><div class="lead-arrow" aria-hidden="true">↗</div></div>
+      <div class="lead-content"><div class="story-category"><span>${escapeHtml(category(article))}</span><i></i><span>LEAD</span></div><h2>${escapeHtml(title(article))}</h2>${description(article) ? `<p>${escapeHtml(description(article))}</p>` : ""}<div class="story-byline"><span>By ${escapeHtml(author(article))}</span><span class="byline-line"></span><span>${readTime(article)} min read</span></div></div>
     </a>`;
-  }).join("");
-  observeReveals(grid);
-}
-
-function renderLatest(items = state.articles) {
-  const grid = $("#latestGrid");
-  if (!grid) return;
-  const visible = items.slice(0, 9);
-  grid.innerHTML = visible.map(cardMarkup).join("");
-  observeReveals(grid);
-}
-
-function renderSearchResults(query) {
-  const normalized = query.trim().toLowerCase();
-  if (!normalized) {
-    renderLatest(state.articles);
-    $("#feedStatus").textContent = `${state.articles.length} published ${state.articles.length === 1 ? "story" : "stories"}`;
-    return;
   }
-  const matches = state.articles.filter((article) => {
-    const haystack = [articleTitle(article), articleDescription(article), articleCategory(article), articleTag(article), articleAuthor(article)].join(" ").toLowerCase();
-    return haystack.includes(normalized);
-  });
-  $("#latest").scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth" });
-  $("#feedStatus").textContent = `${matches.length} result${matches.length === 1 ? "" : "s"} for "${query}"`;
-  renderLatest(matches);
-}
 
-function observeReveals(root = document) {
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach((entry) => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add("visible");
-        observer.unobserve(entry.target);
-      }
+  function renderTicker(items) {
+    const ticker = $("#liveTicker"), track = $("#tickerTrack");
+    if (!ticker || !track) return;
+    const live = items.slice(0, 6);
+    if (live.length < 2) { ticker.hidden = true; return; }
+    const links = live.map(a => `<a href="${escapeHtml(articleUrl(a))}">${escapeHtml(title(a))}</a><i>•</i>`).join("");
+    track.innerHTML = `<div class="ticker-content">${links}</div><div class="ticker-content" aria-hidden="true">${links}</div>`;
+    ticker.hidden = false;
+  }
+
+  function renderLatest(items = state.articles) {
+    const grid = $("#latestGrid");
+    if (!grid) return;
+    grid.innerHTML = items.slice(0, 12).map(cardMarkup).join("");
+    if (!items.length) grid.innerHTML = `<div class="feed-empty"><strong>No published stories match this search.</strong><span>Try another topic or return to the latest feed.</span></div>`;
+    observeReveals(grid);
+  }
+
+  function renderCategory(id, wanted, limit = 3) {
+    const grid = $(`#${id}`), section = grid?.closest("[data-category]");
+    if (!grid || !section) return;
+    const target = wanted.toLowerCase();
+    const matches = state.articles.filter(a => {
+      const values = [category(a), a.subcategory || "", a.meta || "", a.categoryLabel || ""].map(v => String(v).toLowerCase());
+      return values.some(v => v === target || v.split(/[\s/>&]+/).includes(target));
+    }).slice(0, limit);
+    section.hidden = !matches.length;
+    if (matches.length) { grid.innerHTML = matches.map(categoryCardMarkup).join(""); observeReveals(grid); }
+  }
+
+  function renderTechnology() {
+    const grid = $("#technologyGrid"), section = $("#technology");
+    if (!grid || !section) return;
+    const matches = state.articles.filter(a => category(a).toLowerCase() === "technology").slice(0,4);
+    section.hidden = !matches.length;
+    if (!matches.length) return;
+    grid.innerHTML = matches.map(a => `<a class="dark-card reveal" href="${escapeHtml(articleUrl(a))}">${imageMarkup(a,"",false)}<div><div class="story-info"><span>${escapeHtml(tag(a))}</span><i></i><time>${escapeHtml(relativeDate(date(a)))}</time></div><h3>${escapeHtml(title(a))}</h3></div></a>`).join("");
+    observeReveals(grid);
+  }
+
+  function renderSearchResults(query) {
+    const q = query.trim().toLowerCase();
+    if (!q) { state.filtered = state.articles; renderLatest(); $("#feedStatus").textContent = `${state.articles.length} published ${state.articles.length === 1 ? "story" : "stories"}`; return; }
+    const matches = state.articles.filter(a => `${title(a)} ${description(a)} ${category(a)} ${tag(a)} ${author(a)} ${Array.isArray(a.keywords) ? a.keywords.join(' ') : a.keywords || ''}`.toLowerCase().includes(q));
+    state.filtered = matches;
+    $("#feedStatus").textContent = `${matches.length} result${matches.length === 1 ? "" : "s"} for "${query}"`;
+    $("#latest")?.scrollIntoView({behavior:reducedMotion ? "auto" : "smooth", block:"start"});
+    renderLatest(matches);
+  }
+
+  function observeReveals(root = document) {
+    $$(".reveal", root).forEach(el => {
+      el.classList.add("visible");
+      if (reducedMotion) return;
+      el.animate([{opacity:0, transform:"translateY(8px)"},{opacity:1, transform:"translateY(0)"}], {duration:420,easing:"cubic-bezier(.22,1,.36,1)",fill:"both"});
     });
-  }, { threshold: 0.08, rootMargin: "0px 0px -30px" });
-  $$(".reveal", root).forEach((el, index) => {
-    if (!reducedMotion) el.style.transitionDelay = `${Math.min(index * 35, 210)}ms`;
-    observer.observe(el);
-  });
-}
-
-async function loadPublishedArticles() {
-  const status = $("#feedStatus");
-  try {
-    const response = await fetch("./assets/articles.json", { cache: "no-store" });
-    if (!response.ok) throw new Error(`Feed returned ${response.status}`);
-    const payload = await response.json();
-    const raw = Array.isArray(payload) ? payload : Array.isArray(payload.articles) ? payload.articles : Array.isArray(payload.items) ? payload.items : [];
-    state.articles = sortArticles(raw.filter(isPublished));
-    state.filtered = state.articles;
-
-    if (!state.articles.length) {
-      $("#emptyState").hidden = false;
-      $("#leadStoryMount").hidden = true;
-      if (status) status.textContent = "No published stories";
-      return;
-    }
-
-    $("#emptyState").hidden = true;
-    renderLead(state.articles[0]);
-    renderLatest();
-    renderTicker(state.articles);
-    renderCategory("politicsGrid", "politics");
-    renderTechnology();
-    renderCategory("businessGrid", "business");
-    renderCategory("entertainmentGrid", "entertainment");
-    renderCategory("sportsGrid", "sports");
-    renderCategory("trendingGrid", "trending");
-    if (status) status.textContent = `${state.articles.length} published ${state.articles.length === 1 ? "story" : "stories"}`;
-    const latest = state.articles[0];
-    $("#heroDate").textContent = latest ? `Updated ${formatDate(articleDate(latest))}` : "Latest published stories";
-  } catch (error) {
-    console.error("TrendRader feed failed:", error);
-    $("#emptyState").hidden = false;
-    $("#emptyState h2").textContent = "The news feed is temporarily unavailable.";
-    $("#emptyState p").textContent = "TrendRader could not load its published article database. Check the publication build and assets/articles.json.";
-    if (status) status.textContent = "Feed unavailable";
   }
-}
 
-function setupNavigation() {
-  const menuToggle = $("#menuToggle");
-  const mobileNav = $("#mobileNav");
-  menuToggle?.addEventListener("click", () => {
-    const open = mobileNav.classList.toggle("open");
-    menuToggle.setAttribute("aria-expanded", String(open));
-  });
-  $$(".mobile-nav a").forEach((link) => link.addEventListener("click", () => {
-    mobileNav.classList.remove("open");
-    menuToggle.setAttribute("aria-expanded", "false");
-  }));
+  function showFeedError(message) {
+    const empty = $("#emptyState");
+    const status = $("#feedStatus");
+    if (empty) {
+      empty.hidden = false;
+      const h = $("h2", empty), p = $("p", empty);
+      if (h) h.textContent = "The published feed is temporarily unavailable.";
+      if (p) p.textContent = message || "TrendRader could not load its published article database.";
+    }
+    if (status) status.textContent = "Feed unavailable";
+    $("#leadStoryMount")?.setAttribute("hidden", "");
+  }
 
-  const searchToggle = $("#searchToggle");
-  const searchPanel = $("#searchPanel");
-  const searchInput = $("#searchInput");
-  searchToggle?.addEventListener("click", () => {
-    const open = searchPanel.classList.toggle("open");
-    searchPanel.setAttribute("aria-hidden", String(!open));
-    searchToggle.setAttribute("aria-expanded", String(open));
-    if (open) setTimeout(() => searchInput?.focus(), 200);
-  });
-  $("#searchForm")?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    renderSearchResults(searchInput?.value || "");
-  });
-}
+  async function loadPublishedArticles() {
+    const status = $("#feedStatus");
+    try {
+      const response = await fetch(`${DB_PATH}?v=${Date.now()}`, {cache:"no-store", credentials:"same-origin"});
+      if (!response.ok) throw new Error(`Feed returned HTTP ${response.status}.`);
+      const payload = await response.json();
+      const raw = Array.isArray(payload) ? payload : Array.isArray(payload.articles) ? payload.articles : Array.isArray(payload.items) ? payload.items : [];
+      state.articles = sortArticles(raw.filter(isPublished));
+      state.filtered = state.articles;
+      if (!state.articles.length) {
+        $("#emptyState").hidden = false;
+        $("#leadStoryMount").hidden = true;
+        if (status) status.textContent = "No published stories";
+        return;
+      }
+      $("#emptyState").hidden = true;
+      renderLead(state.articles[0]);
+      renderLatest();
+      renderTicker(state.articles);
+      renderCategory("politicsGrid", "politics");
+      renderTechnology();
+      renderCategory("businessGrid", "business");
+      renderCategory("entertainmentGrid", "entertainment");
+      renderCategory("sportsGrid", "sports");
+      renderCategory("trendingGrid", "trending");
+      if (status) status.textContent = `${state.articles.length} published ${state.articles.length === 1 ? "story" : "stories"}`;
+      $("#heroDate").textContent = `Updated ${formatDate(date(state.articles[0]))}`;
+    } catch (error) {
+      console.error("TrendRader feed failed:", error);
+      showFeedError(error.message);
+    }
+  }
 
-function setupNewsletter() {
-  $("#newsletterForm")?.addEventListener("submit", (event) => {
-    event.preventDefault();
-    const email = $("#newsletterEmail");
-    const message = $("#newsletterMessage");
-    if (!email?.validity.valid) { email?.focus(); return; }
-    email.value = "";
-    message.textContent = "You're on the list. Welcome to TrendRader.";
-    message.style.color = "#e86150";
-  });
-}
+  function setupNavigation() {
+    const menu = $("#menuToggle"), nav = $("#mobileNav");
+    menu?.addEventListener("click", () => { const open = nav.classList.toggle("open"); menu.setAttribute("aria-expanded", String(open)); });
+    $$(".mobile-nav a").forEach(link => link.addEventListener("click", () => { nav.classList.remove("open"); menu.setAttribute("aria-expanded","false"); }));
+    const searchToggle = $("#searchToggle"), panel = $("#searchPanel"), input = $("#searchInput");
+    searchToggle?.addEventListener("click", () => { const open = panel.classList.toggle("open"); panel.setAttribute("aria-hidden",String(!open)); searchToggle.setAttribute("aria-expanded",String(open)); if(open) setTimeout(()=>input?.focus(),120); });
+    $("#searchForm")?.addEventListener("submit", e => { e.preventDefault(); renderSearchResults(input?.value || ""); });
+  }
 
-function setupScroll() {
-  const header = $("#siteHeader");
-  window.addEventListener("scroll", () => header?.classList.toggle("scrolled", window.scrollY > 12), { passive: true });
-}
+  function setupNewsletter() {
+    $("#newsletterForm")?.addEventListener("submit", e => { e.preventDefault(); const input=$("#newsletterEmail"), message=$("#newsletterMessage"); if(!input?.validity.valid){input?.focus();return;} input.value=""; message.textContent="You're on the list. Welcome to TrendRader."; });
+  }
+  function setupScroll() { const header=$("#siteHeader"); window.addEventListener("scroll",()=>header?.classList.toggle("scrolled",window.scrollY>12),{passive:true}); }
+  function setupCursor() { const glow=$(".cursor-glow"); if(!glow || reducedMotion || !matchMedia("(hover:hover)").matches)return; window.addEventListener("pointermove",e=>{glow.style.left=`${e.clientX}px`;glow.style.top=`${e.clientY}px`;glow.style.opacity="1";},{passive:true}); }
+  function setupYear() { const y=$("#footerYear"); if(y)y.textContent=new Date().getFullYear(); const t=$("#todayLabel"); if(t)t.textContent=new Intl.DateTimeFormat("en-NG",{month:"long",year:"numeric"}).format(new Date()); }
 
-function setupCursor() {
-  const glow = $(".cursor-glow");
-  if (!glow || reducedMotion || !window.matchMedia("(hover:hover)").matches) return;
-  window.addEventListener("pointermove", (event) => {
-    glow.style.left = `${event.clientX}px`;
-    glow.style.top = `${event.clientY}px`;
-  }, { passive: true });
-}
-
-$("#footerYear").textContent = new Date().getFullYear();
-$("#todayLabel").textContent = new Intl.DateTimeFormat("en-NG", { month:"long", year:"numeric" }).format(new Date());
-setupNavigation();
-setupNewsletter();
-setupScroll();
-setupCursor();
-loadPublishedArticles();
+  setupYear(); setupNavigation(); setupNewsletter(); setupScroll(); setupCursor(); loadPublishedArticles();
+})();
