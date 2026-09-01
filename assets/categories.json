@@ -1,0 +1,372 @@
+{
+  "version": 2,
+  "categories": [
+    {
+      "id": "nigeria",
+      "label": "Nigeria",
+      "title": "Nigeria News",
+      "description": "Breaking and developing news across Nigeria, with reporting from the states, federal government and major institutions.",
+      "subcategories": [
+        {
+          "id": "politics",
+          "label": "Politics",
+          "keywords": [
+            "politics",
+            "president",
+            "senate",
+            "house of representatives",
+            "governor",
+            "election",
+            "political party",
+            "government"
+          ]
+        },
+        {
+          "id": "business-economy",
+          "label": "Business & Economy",
+          "keywords": [
+            "business",
+            "economy",
+            "inflation",
+            "naira",
+            "markets",
+            "finance",
+            "banking",
+            "investment"
+          ]
+        },
+        {
+          "id": "security",
+          "label": "Security",
+          "keywords": [
+            "security",
+            "terrorism",
+            "bandits",
+            "kidnapping",
+            "police",
+            "army",
+            "crime"
+          ]
+        },
+        {
+          "id": "society",
+          "label": "Society",
+          "keywords": [
+            "society",
+            "education",
+            "health",
+            "schools",
+            "universities",
+            "community"
+          ]
+        },
+        {
+          "id": "states",
+          "label": "States",
+          "keywords": [
+            "lagos",
+            "abuja",
+            "kano",
+            "rivers",
+            "enugu",
+            "kaduna",
+            "oyo",
+            "anambra",
+            "state"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "world",
+      "label": "World",
+      "title": "World News",
+      "description": "Major international developments, geopolitics and stories shaping the world.",
+      "subcategories": [
+        {
+          "id": "africa",
+          "label": "Africa",
+          "keywords": [
+            "africa",
+            "african union",
+            "ghana",
+            "kenya",
+            "south africa",
+            "egypt"
+          ]
+        },
+        {
+          "id": "americas",
+          "label": "Americas",
+          "keywords": [
+            "united states",
+            "america",
+            "canada",
+            "latin america",
+            "brazil"
+          ]
+        },
+        {
+          "id": "europe",
+          "label": "Europe",
+          "keywords": [
+            "europe",
+            "european union",
+            "uk",
+            "britain",
+            "france",
+            "germany"
+          ]
+        },
+        {
+          "id": "middle-east",
+          "label": "Middle East",
+          "keywords": [
+            "middle east",
+            "israel",
+            "palestine",
+            "iran",
+            "gaza",
+            "saudi arabia"
+          ]
+        },
+        {
+          "id": "asia-pacific",
+          "label": "Asia-Pacific",
+          "keywords": [
+            "china",
+            "india",
+            "japan",
+            "asia",
+            "pacific",
+            "australia"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "technology",
+      "label": "Technology",
+      "title": "Technology News",
+      "description": "Technology, artificial intelligence, software, hardware, digital platforms and the products changing how people live and work.",
+      "subcategories": [
+        {
+          "id": "artificial-intelligence",
+          "label": "Artificial Intelligence",
+          "keywords": [
+            "ai",
+            "artificial intelligence",
+            "machine learning",
+            "llm",
+            "generative ai",
+            "ai agents"
+          ]
+        },
+        {
+          "id": "software",
+          "label": "Software",
+          "keywords": [
+            "software",
+            "app",
+            "application",
+            "saas",
+            "platform"
+          ]
+        },
+        {
+          "id": "gadgets",
+          "label": "Gadgets & Devices",
+          "keywords": [
+            "gadget",
+            "smartphone",
+            "iphone",
+            "android",
+            "device",
+            "wearable"
+          ]
+        },
+        {
+          "id": "startups",
+          "label": "Startups & Innovation",
+          "keywords": [
+            "startup",
+            "venture",
+            "funding",
+            "innovation",
+            "founder",
+            "technology company"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "business",
+      "label": "Business",
+      "title": "Business News",
+      "description": "Companies, markets, finance, entrepreneurship and the forces moving economies.",
+      "subcategories": [
+        {
+          "id": "markets",
+          "label": "Markets",
+          "keywords": [
+            "stocks",
+            "shares",
+            "markets",
+            "trading",
+            "commodities",
+            "forex"
+          ]
+        },
+        {
+          "id": "companies",
+          "label": "Companies",
+          "keywords": [
+            "company",
+            "corporate",
+            "ceo",
+            "earnings",
+            "acquisition",
+            "merger"
+          ]
+        },
+        {
+          "id": "finance",
+          "label": "Finance",
+          "keywords": [
+            "finance",
+            "bank",
+            "banking",
+            "fintech",
+            "credit",
+            "loan",
+            "investment"
+          ]
+        },
+        {
+          "id": "entrepreneurship",
+          "label": "Entrepreneurship",
+          "keywords": [
+            "entrepreneur",
+            "founder",
+            "small business",
+            "startup",
+            "venture capital"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "entertainment",
+      "label": "Entertainment",
+      "title": "Entertainment News",
+      "description": "Music, film, television, celebrities, culture and the stories people are talking about.",
+      "subcategories": [
+        {
+          "id": "music",
+          "label": "Music",
+          "keywords": [
+            "music",
+            "afrobeats",
+            "album",
+            "song",
+            "artist",
+            "concert"
+          ]
+        },
+        {
+          "id": "film-tv",
+          "label": "Film & TV",
+          "keywords": [
+            "film",
+            "movie",
+            "television",
+            "series",
+            "actor",
+            "actress",
+            "cinema"
+          ]
+        },
+        {
+          "id": "celebrity",
+          "label": "Celebrity",
+          "keywords": [
+            "celebrity",
+            "star",
+            "actor",
+            "singer",
+            "influencer"
+          ]
+        },
+        {
+          "id": "culture",
+          "label": "Culture",
+          "keywords": [
+            "culture",
+            "fashion",
+            "lifestyle",
+            "arts",
+            "creative"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sports",
+      "label": "Sports",
+      "title": "Sports News",
+      "description": "Football and sports news from Nigeria and around the world.",
+      "subcategories": [
+        {
+          "id": "football",
+          "label": "Football",
+          "keywords": [
+            "football",
+            "soccer",
+            "super eagles",
+            "premier league",
+            "champions league"
+          ]
+        },
+        {
+          "id": "other-sports",
+          "label": "Other Sports",
+          "keywords": [
+            "basketball",
+            "tennis",
+            "athletics",
+            "boxing",
+            "sports"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "trending",
+      "label": "Trending",
+      "title": "Trending Stories",
+      "description": "The stories, conversations and developments gaining attention right now.",
+      "subcategories": [
+        {
+          "id": "viral",
+          "label": "Viral",
+          "keywords": [
+            "viral",
+            "trending",
+            "social media",
+            "internet"
+          ]
+        },
+        {
+          "id": "explainer",
+          "label": "Explainers",
+          "keywords": [
+            "explainer",
+            "what to know",
+            "why it matters",
+            "explained"
+          ]
+        }
+      ]
+    }
+  ]
+}
