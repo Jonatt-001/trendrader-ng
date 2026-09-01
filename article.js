@@ -158,23 +158,62 @@ async function fetchJson(path) {
   return response.json();
 }
 
+function getServerRenderedArticle(slug = "") {
+  const title = String($(".article-title")?.textContent || "").trim();
+  const description = String($(".article-dek")?.textContent || "").trim();
+  const image = String($("#heroImage")?.getAttribute("src") || "").trim();
+  const imageAlt = String($("#heroImage")?.getAttribute("alt") || title).trim();
+  const category = String($(".article-kicker > span:last-child")?.textContent || "News").trim();
+  const tag = String($(".kicker-label")?.textContent || "News Report").trim();
+  const author = String($(".author strong")?.textContent || "TrendRader Editorial").trim();
+  const canonical = String($('link[rel="canonical"]')?.getAttribute("href") || "").trim();
+  const canonicalSlug = slug || canonical.split("/").filter(Boolean).pop()?.replace(/\.html$/i, "") || "";
+  const body = $("#articleBody");
+  const bodyHtml = body ? body.innerHTML.trim() : "";
+  const hasBodyContent = Boolean(
+    bodyHtml &&
+    bodyHtml.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim().length > 20 &&
+    !/^\{\{ARTICLE_BODY\}\}$/.test(bodyHtml)
+  );
+
+  if (!title || !canonicalSlug) return null;
+
+  return normalizeArticle({
+    title,
+    desc: description,
+    image,
+    imageAlt,
+    category,
+    tag,
+    author,
+    slug: canonicalSlug,
+    url: canonical || `${BASE_SITE}/articles/${canonicalSlug}.html`,
+    date: $('meta[name="date"]')?.getAttribute("content") || "",
+    modified: $('meta[name="last-modified"]')?.getAttribute("content") || "",
+    bodyHtml: hasBodyContent ? bodyHtml : ""
+  });
+}
+
 async function resolveArticle() {
   const runtime = $("#articleRuntimeData");
   const rawRuntime = runtime?.textContent?.trim() || "";
-  const hasTemplateTokens = /\{\{[A-Z_]+\}\}/.test(document.documentElement.innerHTML);
   const slug = getSlugFromLocation();
-
-  if (!hasTemplateTokens && !slug && !rawRuntime) return null;
+  const serverArticle = getServerRenderedArticle(slug);
+  const hasPublishedMarkup = Boolean(serverArticle);
 
   let runtimeArticle = null;
-  if (rawRuntime && !/\{\{/.test(rawRuntime)) {
+  if (rawRuntime && !/^\{\{/.test(rawRuntime)) {
     try {
       const parsed = JSON.parse(rawRuntime);
       if (parsed && typeof parsed === "object" && parsed.title) {
         runtimeArticle = normalizeArticle(parsed);
-        runtimeArticle.slug = runtimeArticle.slug || slug;
-        runtimeArticle.url = parsed.url || runtimeArticle.url;
-        runtimeArticle.category = String(parsed.categoryLabel || parsed.category || runtimeArticle.category || "News").trim();
+        if (runtimeArticle) {
+          runtimeArticle.slug = runtimeArticle.slug || slug;
+          runtimeArticle.url = parsed.url || runtimeArticle.url;
+          runtimeArticle.category = String(
+            parsed.categoryLabel || parsed.category || runtimeArticle.category || "News"
+          ).trim();
+        }
       }
     } catch (error) {
       console.warn("TrendRader runtime article data could not be parsed.", error);
@@ -185,7 +224,13 @@ async function resolveArticle() {
   let databaseError = null;
   try {
     const payload = await fetchJson(articleDatabaseUrl());
-    const raw = Array.isArray(payload) ? payload : Array.isArray(payload.articles) ? payload.articles : Array.isArray(payload.items) ? payload.items : [];
+    const raw = Array.isArray(payload)
+      ? payload
+      : Array.isArray(payload.articles)
+        ? payload.articles
+        : Array.isArray(payload.items)
+          ? payload.items
+          : [];
     articles = sortArticles(raw.map(normalizeArticle).filter(isPublished));
   } catch (error) {
     databaseError = error;
@@ -193,23 +238,37 @@ async function resolveArticle() {
   }
 
   let article = null;
+
   if (slug && articles.length) {
-    article = articles.find((item) => item.slug === slug || item.url.replace(/\/$/, "").endsWith(`${slug}.html`)) || null;
+    article = articles.find((item) =>
+      item.slug === slug ||
+      String(item.url || "").replace(/\/$/, "").endsWith(`${slug}.html`)
+    ) || null;
   }
+
   if (!article && runtimeArticle) article = runtimeArticle;
+  if (!article && serverArticle) article = serverArticle;
   if (!article && articles.length && !slug) article = articles[0];
+
   if (!article) {
-    if (databaseError) throw new Error(`Published article data could not be loaded. ${databaseError.message}`);
+    if (databaseError) {
+      throw new Error(`Published article data could not be loaded. ${databaseError.message}`);
+    }
     throw new Error("No published TrendRader article matches this URL.");
   }
 
   let bodyHtml = "";
   const existingBody = $("#articleBody");
-  const existingBodyHtml = existingBody && !hasTemplateTokens ? existingBody.innerHTML.trim() : "";
+  const existingBodyHtml = existingBody ? existingBody.innerHTML.trim() : "";
+  const existingBodyIsReal = Boolean(
+    existingBodyHtml &&
+    existingBodyHtml.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim().length > 20 &&
+    !/^\{\{ARTICLE_BODY\}\}$/.test(existingBodyHtml)
+  );
 
   if (article.bodyHtml || article.content || article.body) {
     bodyHtml = safeBodyHtml(article.bodyHtml || article.content || article.body);
-  } else if (existingBodyHtml) {
+  } else if (existingBodyIsReal) {
     bodyHtml = safeBodyHtml(existingBodyHtml);
   } else if (article.delta) {
     try {
@@ -223,7 +282,14 @@ async function resolveArticle() {
     }
   }
 
-  return { article, articles, bodyHtml, rawRuntime };
+  return {
+    article,
+    articles,
+    bodyHtml,
+    rawRuntime,
+    source: runtimeArticle ? "runtime" : serverArticle ? "server" : "feed",
+    databaseError
+  };
 }
 
 function hydrateArticlePage(resolved) {
@@ -441,7 +507,7 @@ function setupLightbox() {
 function setupNewsletter() {
   $("#newsletterForm")?.addEventListener("submit", (event) => {
     event.preventDefault();
-    const email = $("#email");
+    const email = $("#email") || $("#newsletterEmail");
     const message = $("#newsletterMessage");
     if (!email?.validity.valid) { email?.focus(); return; }
     email.value = "";
@@ -484,13 +550,43 @@ async function init() {
 
   try {
     const resolved = await resolveArticle();
-    if (resolved) hydrateArticlePage(resolved);
+    if (resolved) {
+      try {
+        hydrateArticlePage(resolved);
+      } catch (error) {
+        console.error("TrendRader article hydration failed:", error);
+        // Never replace a server-rendered published story with an error screen.
+        // The article HTML generated by the publisher is already valid content.
+        const body = $("#articleBody");
+        const hasRealBody = Boolean(
+          body &&
+          body.innerHTML.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim().length > 20
+        );
+        if (!hasRealBody) {
+          setMeta('meta[name="robots"]', "noindex, follow");
+          if (body) {
+            body.innerHTML = `<div class="article-load-error"><p>This article is temporarily unavailable.</p><a href="../index.html">Return to TrendRader</a></div>`;
+          }
+        }
+      }
+    }
   } catch (error) {
     console.error("TrendRader article load failed:", error);
-    document.title = "TrendRader — Article";
-    setMeta('meta[name="robots"]', "noindex, follow");
     const body = $("#articleBody");
-    if (body) body.innerHTML = `<div class="article-load-error"><p>This article could not be loaded from the published TrendRader feed.</p><a href="../index.html">Return to TrendRader</a></div>`;
+    const hasRealBody = Boolean(
+      body &&
+      body.innerHTML.replace(/<[^>]*>/g, " ").replace(/&nbsp;/g, " ").trim().length > 20
+    );
+
+    // A generated article can be rendered entirely server-side. Never destroy
+    // valid published content just because the feed/API is temporarily stale.
+    if (!hasRealBody) {
+      document.title = "TrendRader — Article";
+      setMeta('meta[name="robots"]', "noindex, follow");
+      if (body) {
+        body.innerHTML = `<div class="article-load-error"><p>This article is temporarily unavailable.</p><a href="../index.html">Return to TrendRader</a></div>`;
+      }
+    }
   }
   observeReveals();
 }
